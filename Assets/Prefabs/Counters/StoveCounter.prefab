@@ -68,14 +68,66 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5220305274835918568, guid: 93af8b85a17635f40a5b76ed82a86c18,
+        type: 3}
+      propertyPath: ShapeModule.type
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5220305274835918568, guid: 93af8b85a17635f40a5b76ed82a86c18,
+        type: 3}
+      propertyPath: ShapeModule.radiusThickness
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5220305274835918574, guid: 93af8b85a17635f40a5b76ed82a86c18,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4589716710238282922, guid: 93af8b85a17635f40a5b76ed82a86c18,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6516612982701579801}
   m_SourcePrefab: {fileID: 100100000, guid: 93af8b85a17635f40a5b76ed82a86c18, type: 3}
 --- !u!4 &60825775873991286 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4589716710238282923, guid: 93af8b85a17635f40a5b76ed82a86c18,
+    type: 3}
+  m_PrefabInstance: {fileID: 4569442504013072093}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &60825775873991287 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4589716710238282922, guid: 93af8b85a17635f40a5b76ed82a86c18,
+    type: 3}
+  m_PrefabInstance: {fileID: 4569442504013072093}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6516612982701579801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 60825775873991287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27aaa61325dc6c941b384541c6f77fd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stoveOnGameObject: {fileID: 4563450333452226490}
+  particlesGameObject: {fileID: 8582686896645478451}
+  stoveCounter: {fileID: 3930221685317035861}
+--- !u!1 &4563450333452226490 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 17251720544094567, guid: 93af8b85a17635f40a5b76ed82a86c18,
+    type: 3}
+  m_PrefabInstance: {fileID: 4569442504013072093}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8582686896645478451 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5220305274835918574, guid: 93af8b85a17635f40a5b76ed82a86c18,
     type: 3}
   m_PrefabInstance: {fileID: 4569442504013072093}
   m_PrefabAsset: {fileID: 0}
@@ -201,6 +253,8 @@ MonoBehaviour:
   counterTopPoint: {fileID: 6577192541597089690}
   fryingRecipeSOArray:
   - {fileID: 11400000, guid: 2c1653087b17e2941980599f00de5077, type: 2}
+  burningRecipeSOArray:
+  - {fileID: 11400000, guid: 7b955c311e8da4c4ca8f5b486cbe87de, type: 2}
 --- !u!4 &7546451027999830171 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3534536252092058708, guid: 27ea4dc8b8e083a498a833da594fdc66,
