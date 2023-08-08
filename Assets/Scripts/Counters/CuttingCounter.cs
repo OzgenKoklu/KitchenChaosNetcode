@@ -69,8 +69,8 @@ public class CuttingCounter : BaseCounter, IHasProgress
         {
             //cut the thing if theres a kitchen object that can be cut
             cuttingProgress++;
-            OnCut?.Invoke(player, EventArgs.Empty);
-            OnAnyCut?.Invoke(player, EventArgs.Empty);
+            OnCut?.Invoke(this, EventArgs.Empty);
+            OnAnyCut?.Invoke(this, EventArgs.Empty);
 
             CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(GetKitchenObject().GetKitchenObjectSO());
 
