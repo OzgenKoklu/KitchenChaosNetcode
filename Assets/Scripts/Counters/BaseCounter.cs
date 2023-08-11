@@ -6,6 +6,11 @@ using UnityEngine;
 public class BaseCounter : MonoBehaviour, IKitchenObjectParent
 {
 
+    public static void ResetStaticData()
+    {
+        OnAnyObjectPlacedHere = null;
+    }
+
     public static event EventHandler OnAnyObjectPlacedHere;
     [SerializeField] private Transform counterTopPoint;
 
