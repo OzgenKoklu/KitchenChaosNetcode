@@ -5,6 +5,16 @@ using UnityEngine;
 
 public class GameInput : MonoBehaviour
 {
+    public enum Binding
+    {
+        Move_Up,
+        Move_Down, 
+        Move_Left, 
+        Move_Right,
+        Interact,
+        InteractAlternate,
+        Pause,
+    }
     public static GameInput Instance { get; private set; }
     public event EventHandler OnInteractAction;
     public event EventHandler OnInteractAlternateAction;
@@ -86,4 +96,26 @@ public class GameInput : MonoBehaviour
         return inputVector;
     }
 
+    public string GetBindingText(Binding binding)
+    {
+        switch (binding)
+        {
+            default:
+            case Binding.Interact:
+               return playerInputActions.Player.Interact.bindings[0].ToDisplayString();
+            case Binding.InteractAlternate:
+                return playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString();
+            case Binding.Pause:
+                return playerInputActions.Player.Pause.bindings[0].ToDisplayString();
+                //Composite bindings. bindings[0] is 2d move vector
+            case Binding.Move_Up:
+                return playerInputActions.Player.Move.bindings[1].ToDisplayString();
+            case Binding.Move_Down:
+                return playerInputActions.Player.Move.bindings[2].ToDisplayString();
+            case Binding.Move_Left:
+                return playerInputActions.Player.Move.bindings[3].ToDisplayString();
+            case Binding.Move_Right:
+                return playerInputActions.Player.Move.bindings[4].ToDisplayString();
+        }
+    }
 }
