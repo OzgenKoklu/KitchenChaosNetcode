@@ -28,6 +28,7 @@ public class OptionsUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI interactText;
     [SerializeField] private TextMeshProUGUI interactAlternateText;
     [SerializeField] private TextMeshProUGUI pauseText;
+    [SerializeField] private Transform presstoRebindKeyTransform;
 
     private void Awake()
     {
@@ -36,26 +37,38 @@ public class OptionsUI : MonoBehaviour
         soundEffectsButton.onClick.AddListener(() =>
         {
             SoundManager.Instance.ChangeVolume();
-            updateVisual();
+            UpdateVisual();
         });
 
         musicButton.onClick.AddListener(() =>
         {
             MusicManager.Instance.ChangeVolume();
-            updateVisual();
+            UpdateVisual();
         });
 
         closeButton.onClick.AddListener(() =>
         {
             Hide();
         });
+
+        moveUpButton.onClick.AddListener(() =>{RebindBinding(GameInput.Binding.Move_Up);});
+        moveDownButton.onClick.AddListener(() => { RebindBinding(GameInput.Binding.Move_Down); });
+        moveLeftButton.onClick.AddListener(() => { RebindBinding(GameInput.Binding.Move_Left); });
+        moveRightButton.onClick.AddListener(() => { RebindBinding(GameInput.Binding.Move_Right); });
+        interactButton.onClick.AddListener(() => { RebindBinding(GameInput.Binding.Interact); });
+        interactAlternateButton.onClick.AddListener(() => { RebindBinding(GameInput.Binding.InteractAlternate); });
+        pauseButton.onClick.AddListener(() => { RebindBinding(GameInput.Binding.Pause); });
+
+
     }
     private void Start()
     {
         KitchenGameManager.Instance.OnGameUnpaused += KitchenGameManager_OnGameUnpaused;
-        updateVisual();
+        UpdateVisual();
 
         Hide();
+
+        HidePressToRebindKey();
     }
 
     private void KitchenGameManager_OnGameUnpaused(object sender, System.EventArgs e)
@@ -63,9 +76,9 @@ public class OptionsUI : MonoBehaviour
         Hide();
     }
 
-    private void updateVisual()
+    private void UpdateVisual()
     {
-        soundEffectsText.text = "Sound Effects: " + Mathf.Round(SoundManager.Instance.GetVolume() * 10f) ;
+        soundEffectsText.text = "Sound Effects: " + Mathf.Round(SoundManager.Instance.GetVolume() * 10f);
         musicText.text = "Sound Effects: " + Mathf.Round(MusicManager.Instance.GetVolume() * 10f);
 
         moveUpText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Move_Up);
@@ -84,5 +97,25 @@ public class OptionsUI : MonoBehaviour
     private void Hide()
     {
         gameObject.SetActive(false);
+    }
+
+    private void ShowPressToRebindKey()
+    {
+        presstoRebindKeyTransform.gameObject.SetActive(true);
+    }
+
+    private void HidePressToRebindKey()
+    {
+        presstoRebindKeyTransform.gameObject.SetActive(false);
+    }
+
+    private void RebindBinding(GameInput.Binding binding)
+    {
+        ShowPressToRebindKey();
+        GameInput.Instance.RebindBinding(binding, () =>
+        {
+            HidePressToRebindKey();
+            UpdateVisual();
+        });
     }
 }
