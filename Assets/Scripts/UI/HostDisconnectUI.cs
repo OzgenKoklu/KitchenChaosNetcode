@@ -1,13 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameOverUI : MonoBehaviour
+public class HostDisconnectUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI recipesDeliveredText;
     [SerializeField] private Button playAgainButton;
 
     private void Awake()
@@ -20,33 +18,23 @@ public class GameOverUI : MonoBehaviour
     }
     private void Start()
     {
-        KitchenGameManager.Instance.OnStateChanged += KitchenGameManager_OnStateChanged;
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
         Hide();
     }
 
-    private void KitchenGameManager_OnStateChanged(object sender, System.EventArgs e)
+    private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
     {
-        if (KitchenGameManager.Instance.IsGameOver())
+       if(clientId == NetworkManager.ServerClientId)
         {
+            //server is the one who is disconnected
             Show();
-            recipesDeliveredText.text = DeliveryManager.Instance.GetSuccessfulRecipesAmout().ToString();
         }
-        else
-        {
-            Hide();
-        }
-    }
-
-    private void Update()
-    {
-  
     }
 
     private void Show()
     {
         gameObject.SetActive(true);
     }
-
     private void Hide()
     {
         gameObject.SetActive(false);
