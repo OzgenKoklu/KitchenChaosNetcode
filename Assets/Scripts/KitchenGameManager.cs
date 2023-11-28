@@ -8,6 +8,7 @@ public class KitchenGameManager : NetworkBehaviour
 {
 
     public static KitchenGameManager Instance;
+
     public event EventHandler OnStateChanged;
     public event EventHandler OnLocalGamePaused;
     public event EventHandler OnLocalGameUnpaused;
@@ -21,6 +22,8 @@ public class KitchenGameManager : NetworkBehaviour
         GamePlaying,
         GameOver,
     }
+
+    [SerializeField] private Transform playerPrefab;
 
     private NetworkVariable<State> state = new NetworkVariable<State>(State.WaitingToStart);
     private bool isLocalPlayerReady;
@@ -44,23 +47,35 @@ public class KitchenGameManager : NetworkBehaviour
     {
         GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
         GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
-
-        if (IsServer)
-        {
-            NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
-        }
     }
 
     private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
     {
         autoTestGamePausedState = true;
         //to skip one frame and be sure clientID is removed from list of connected Id's
+      
+    }
+
+    private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+    {
+        foreach(ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            Transform playerTransform = Instantiate(playerPrefab);
+           
+            playerTransform.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+        }
     }
 
     public override void OnNetworkSpawn()
     {
         state.OnValueChanged += State_OnValueChanged;
         isGamePaused.OnValueChanged += IsGamePaused_OnValueChanged;
+
+        if (IsServer)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
+        }
     }
 
     private void IsGamePaused_OnValueChanged(bool previousValue, bool newValue)
