@@ -98,7 +98,11 @@ public class CuttingCounter : BaseCounter, IHasProgress
     [ServerRpc(RequireOwnership =false)]
     private void CutObjectServerRpc()
     {
-        CutObjectClientRpc();
+        if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
+        {
+            //cut the thing if theres a kitchen object that can be cut
+            CutObjectClientRpc();
+        }
     }
 
     [ClientRpc]
@@ -108,6 +112,10 @@ public class CuttingCounter : BaseCounter, IHasProgress
         OnCut?.Invoke(this, EventArgs.Empty);
         OnAnyCut?.Invoke(this, EventArgs.Empty);
 
+
+        //This part is prone to error when jitter or lag is too much, cuttingrecipeSO returns null if client trys to cut object way too many times
+        //Client authoritative model is ok for this casual game but we need to validate the actions of the client
+        //so we need to check it in serverRPC(rather than interactAlternate) that triggers this clientRPC to avoid this null reference exception. 
         CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(GetKitchenObject().GetKitchenObjectSO());
 
         OnProgressChanged?.Invoke(this, new IHasProgress.OnProgressChangedEventArgs
@@ -120,7 +128,10 @@ public class CuttingCounter : BaseCounter, IHasProgress
     [ServerRpc(RequireOwnership =false)]
     public void TestCuttingProgressDoneServerRpc()
     {
-        CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(GetKitchenObject().GetKitchenObjectSO());
+        if (HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
+        {
+            //cut the thing if theres a kitchen object that can be cut
+            CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithInput(GetKitchenObject().GetKitchenObjectSO());
         if (cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)
         {
             KitchenObjectSO outputKitchenObjectSO = GetOutputForInput(GetKitchenObject().GetKitchenObjectSO());
@@ -128,6 +139,7 @@ public class CuttingCounter : BaseCounter, IHasProgress
             KitchenObject.DestroyKitchenObject(GetKitchenObject());
 
             KitchenObject.SpawnKitchenObject(outputKitchenObjectSO, this);
+        }
         }
     }
 

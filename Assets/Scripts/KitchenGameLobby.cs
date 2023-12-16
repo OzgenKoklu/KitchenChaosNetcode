@@ -50,7 +50,8 @@ public class KitchenGameLobby : MonoBehaviour
         {
             //ayný buildi ayný pcde açarken denenebilmesi için farklý profillerle giriþ yapýyoruz.
             InitializationOptions initializationOptions = new InitializationOptions();
-            initializationOptions.SetProfile(UnityEngine.Random.Range(0,1000).ToString());
+            //initializationOptions.SetProfile(UnityEngine.Random.Range(0,1000).ToString());
+           //This line above is for launching multiple games on the same machine to test the multiplayer functions. Can be commented out for final build.
             await UnityServices.InitializeAsync(initializationOptions);
 
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
