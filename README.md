@@ -315,28 +315,129 @@ aynı zamanda playerVisual.cs'den de renk ayarlama özelliğini kullanıp bu pla
 -CharacterSelectReady.cs'de OnReadyChanged diye event yapmışız. (visual'ı update etmek için). Aynı zamanda SetPlayerReady sadece client'a haber veriyordu oyun başlasın diye
 artık diğer oyuncular da görebilsin diye SetPLayerReadyClientRPC de kullanıyoruz. Bu da tüm clientların görsel olarak update almasını sağlayacak logic tetikliyor
 Ready dictionary'i onlar için de güncelleyip OnReadyChanged'i tetikliyor. Ayrıca. IsPlayerReady(clientID) alan func yazmışız bu da characterSelectPlayer.cs'de kullandığımız fonksiyondu.
--KitchenGameMultiplayer.cs'de//// Gün sonu 
+-KitchenGameMultiplayer.cs'de List<Color> tutuyoruz. ClientConnectedCallback'te bağlanan playera data oluştururken ilk kullanılmamış rengi veriyoruz struct'a (GetfirstUnusedColorID diye func yazmışız.
+PlayerData'ya indexten erişim için func yapmışız. ColorId indexinden color döndüren func yazmışız(listeden). ClientId'den index döndüren func yazmışız
+ClientId'den PlayerData döndüren func yazmışız. Bir de düz playerData döndüren func yazmışız. bu yazdığımız ClienId'den döndüren func'ı Network.Singleton.LocalClientID ile çağırıyor.
+Color değiştirme (server rpc), Color'ın kullanılabilir olup olmadığına bakma, ve ilk kullanılmamış color'ı alma fonksiyonları yazmışız. 
+ServerRPC önce parametre olarak gelen seçilmek istenen color'ın kullanılabilir olup olmadığına bakara değilse hiçbi şey yapmadan return yapar.
+Eğer color müsaitse önce playerData indexini clientId üstünden (serverpcparams defaulttan gelen) çeker. bu indexte bir PlayerData yaratır. 
+yarattığı struct'ın colorId'sini seçilen colorId yapar. ve sonra listenin çekilen indexinin üstüne bu structı tekrar yazdırır. Struct value type olduğu için bu aşamalar gereklidir. 
+IsColorAwailable'da bi colorId parametresi alıyor. PlayerDataNetworkList'teki tüm PlayerDataları döndürüyor ve seçilen colorId'nin herhangi bi PlayerData.colorId'ye eşit olup olmadığına bakıyor. 
+Foreach loop'undan çıkarsa true olarak dönüo. GeFirstUnusedColorId'de PlayerColorList.count'a kadar bir for döngüsü dönüyor. indisteki colorId'nin awailable olup olmadığına bakılır (yazdığımız IsColorAvailable func ile) 
+Eğer müsaitse indisi döndürür.
+-PlayerData'ya colorId eklendi ve onu da IEquatable ve NetworkSerialize'ın içine sokuyoruz. 
+-PlayerVisual.cs ekrandaki dummylerin tekil olarak rengini değiştiren script. kafa ve vücut için iki farklı meshrenderer var bunları tutçekbırak ile almışız.
+bir tane private Material material'ımız var awake'de bu material'ı meshrenderer'daki materyalden initiate ediyoruz. sonra head ve body'deki material'ı da bu materyale eşliyoruz.
+SetPlayerColor'da da material rengini gelen color parametresine eşliyoruz. Bu fonksiyonu characterSelectPlayer.cs'te UpdatePlayer içinde kullanıyorduk o da liste değişimlerine filan sub olmuş durumda.
+-CharacterSelectSingleUI.cs Ekrandaki color buttonlarına renk vermek için kullanıyoruz. Aynı zamanda button işlevi de taşıyor. ve kendine atanmış colorId ile ChangePlayerColor(colorID) tetikliyor
+Startta OnPlayerDataNetworkListChanged'i takip ediyor. kendine atanmışcolorID ile kendi rengini alıyor KitchenGameMultiplayer'dan.
+Sonra da seçilip seçilmediğini updateliyor. takip ettiği eventte de triggerlanınca gene seçilip seçilmediğini açıp kapıyor. 
+Eğer lokal oyuncu bu colorID'yi seçmişse selectedGameObject'i açıp kapıyor. 
 
 Commitle ilgili yorumum: 
 
-****COMMIT 15 - 9f8bb1b
--
+****COMMIT 15 - 6c16e8
+-ChangeSelectedPlayer.cs'de  Yeni bir kick buttonu koyduk start'ta isServer olmasına göre açıyoruz. Bunla tekil dummyler için olduğu için üstlerine atanmış indexler var
+index'ine göre playerDataya erişiyoruz. PlayerData'dan da clientId'ye erişip KitchenGameMultiplayer'daki kickplayer özelliği ile atıyoruz. 
+Aynı zamanda onDestroy'da bu obje takip ettiği eventlerden unsub oluyor. (lifetime meselesi)
+-KitchenGameMultiplayer.cs'da OnClientDisconnectCallback'i server olarak ayrıca takip ediyoruz çünkü PlayerDataNetworkList'i modifiye edeceğiz. 
+bu callback'ten bağlantısı düşen oyuncunun clientId parametresini playerData.clientID'ler arasında aratarak indisini buluyoruz ve o indisteki liste elemanını çıkarıyoruz.
+Ayrıca bu scripte normal OnClientDisconnectCallback'i de client özelinde onfailedtojoinGame'i tetikleyen bir event haline getirmişiz. Server bağlantısı kopan client'ı playerdatadan silerken client ise sadece ekrana erör mesajı yazdırıyor.
+KitckPlayer ise NetworkManager.Singleton.DisconnectClient(clientId) ile client'ın bağlantısını koparıyor ve normalde bağlantı kopunca datasını silme eventini kendisi tetikliyor. 
+-Player.cs'de playerVisual scriptine referans var. artık gameplayde de playerin rengini ayarlıyoruz startta clientId'den playerdataya, playerdata'dan colorId'ye erişerek.
+ayrıca SpawnPositionını artık playerData index'i alarak ayarlıyoruz. çünkü diğer türlü disconnectlerde sorun oluşuyordu.
+-CharacterSelectSingleUI ve HostDisconnectUI artık ondestroy'da sub oldukları eventlerden unsub oluyorlar. (lifetimelar farklı diye)
+
 Commitle ilgili yorumum: 
 
-****COMMIT 16 - 9f8bb1b
--
+****COMMIT 16 - e2f19b2 UNITY LOBBY ADDED
+-Unity'nin lobby paketi eklendi burda. sahnelere bir sürü UI objesi eklendi (text input filan için).
+-Lobiler artık unity server üstünden bağlanmamızı sağlıyor. Şimdiye kadar olan sourcecode sadece localIP üstünden bağlanmamızı sağlıyordu.
+-CharacterSelectPlayer.cs'de kickplayer özelliği aynı zamanda lobiden de karakteri atıyor(kitchenGameLobby.cs'den func ile). (clientId'ye göre)
+Aynı zamanda UpdatePlayer'ın içine playerNameText de dahil edildi. PlayerData'da artık tutulan playerName stringe dönüştürüp karakterin üstündeki worldspaceUI'a yazdırılıyor
+-CharacterSelectReady'nin içine tüm clientlar hazır olduğunda lobbyi silme komutu eklendi. (kitchenGameLobby.cs'deki func çalışıyor) Çünkü lobinin tek amacı server üstünden ilk bağlantıyı kurmak. Sonraki bağlantı için relay'i kullanacağız.
+Lobby sadece playerların çeşitli özelliklerle oda kurmak ve odaları dünya çapında arattırmak filtreli/filtresiz aratmak, bağlanmak, buluşmak üstüne. 
+****Lobilere dair çok önemli bilgiler burada, işin doğası gereği çok farklı classlar kullandık, çok kurcalama fırsatı bulamadan pek çok konsepti kullanıp geçtik.
+****Bir back-end developer kadar öğrenmenin de çok anlamlı olduğunu düşünmüyorum o yüzden biraz kopyala yapıştır kod halinde kullanmakta pek sakıncası olmayan teknikler.
+****Ayrıca çok iyi anladığımı iddia edemicem, anlamak için üstünden geçiyorum ama göreceğiz.
+****Bir not daha, Authenticationservices ve lobbylerde bulunan bazı hazır fonksiyonların isimlendirmeleri filan baya kolay, kodu okuyunca ingilizce okumuş gibi anlaşılıyor zaten.
+-KitchenGameLobby.cs Unity.services.Authentication'ı kullanan ve lobi işlerini halleden temel script. Bir singleton, Lobinin kurulmasına, kurulurken sorun çıkmasına
+lobiye joinlenme girişimine ve girişimin faillanmasına dair eventler mevcut. Aynı zamanda mevcut lobilerin listesinin değişmesi durumunda tetiklenen bir event de var
+Eventargs içinde de list<Lobby> gönderiyor. Katılınan lobiyi Lobby clası şeklinde tutuyoruz. (services.lobbies veya lobbies.models'dan geliyor)
+Heartbeat konsepti lobinin backend'de ölmemesi için devamlı gönderilmesi gereken sinyal ile alakalı. Lobiyi kuran bu sinyali göndermek için timer tutuyor.
+Yeni lobileri listelemek veya listeyi güncellemek için de timer kurmuşuz. Awake'de DontDestroyOnLoad diyoruz çünkü bu lobi objesi LobbyScene > CharacterSelectScene boyunca yaşamını sürdürücek.
+Ve lokal yazdığımız InitializeUnityAuthenticaion() yapıyoruz. Bu bir Async fonksiyon yani tek cycle'da tamamlanmak zorunda değil. İşlem tamamlanınca koda olduğu yerden devam edecek.
+Eğer UnityServices.State başlatılmamışsa: InitializationOption tanımlıyoruz. (bir class) içinden gelen .SetProfile(string x) ile Random bir isimle profil oluşturup giriyoruz.
+Ve servisi bu random isimle başlatıyoruz. Aynı zamanda servera bağlanırken yaptığımız her şeyi await'li yapıyoruz çünkü tek framede gerçekleşmesi imkansız
+ve server'dan bilgi gelene kadar işlemi askıya almamızı sağlıyor (async/await). AuthenticationService.Instance'dan da anonim olarak login fonksiyonunu çağırıyoruz.
+Burada SignInAnonymouslyAsync()'ye ek Unity ID, appleId, playstore ID, steam ID veya konsollardaki ID gibi başka alternatifler de mevcut. 
+Update'de heartbeat'i ve liste güncelleme fonksiyonlarını yapyıro.
+HandlePeriodicListLobbies() eğer bir lobby'e katılmadıysak ve AuthenticationService'de IsSignedIn isek VE Scenemanager'daki sahne lobbyscene ise
+timer sayar ve timer bittiğinde timerı tekrar ayarlar, ve lokal fonksiyon olan ListLobbies()'i uygular. 
+ListLobbies() 
+HandleHeartBeat() ise IsLobbyHost() durumunda heartbeat sayacını sayar, sayaç dolunca sayacı tekrar ayarlar ve
+await LobbyService.Instance.SendHeartBeatPingAsync(joinedLobby.Id) hazır fonksiyonu ile bağlanılmış lobiye heartbeat gönderir. 
+isLobbyHost() bool döndüren bir lokal fonksiyon, joinedLobby null değilse VE joinedLobby.HostID() AuthenticationService'deki PlayerID ile eşitse / 
+YANİ KISACASI KODU ÇALIŞTIRAN KİŞİ HOST İSE 1 DÖNDÜRÜR. 
+CreateLobby(String LobbyName, bool isPrivate) lobi yaaratmak için kullandığımız fonksiyon, 
+OnCreateLobbyStarted eventini invoke ediyor, try catch içinde bağlanılmış lobiyi, isim, lobby kişi sayısı ve CreateLobbyOptions {Isprivate} ile oluşturduğumuz yeni lobiye eşliyoruz.
+Bir yandan KitchenGameManager'dan paralel olarak Host'u başlatıyoruz. ve Character selectScene'e gidiyoruz. 
+Catch durumunda herhangi bir lobbyServiceException'ı logluyor ve OnCreateLobbyFailed eventini invoke ediyor. 
+Burada not olarak: Lobiler ve Netcode'daki Host/Client paralel olarak çalışıyor.
+QuickJoin'de OnJoinStarted invoke ediliyor. Ve LobbyService'in QuickJoinLobbyAsync() fonksiyonu çalıştırılıyor, ve KitchenGameMultiplayerdaki StartClient() çalışıyor
+Catchde de erörü yazdırıp OnQuickJoinFailed invoke ediyoruz. 
+JoinWithCode(string lobbycode) JoinLobbybyCodeAsync(lobbycode) ile joinedLobby'i seçiyor ve client'ı başlatıyor. Catch aynı şekil öncekiyle. 
+JoinWithLobbyId(string lobbyId) aynı şeyi JoinLobbyByIdAsync(LobbyId) ile yapıyor. 
+DeleteLobby() ise JoinedLobby null deil ise LobbyService.Instance.DeleteLobbyAsync(joinedLobby.Id) ile lobbyi siliyor, local JoinedLobbyi nulluyor. (bunu host olarak çıkış yaparken kullanıyoruz)
+LeaveLobby()'de LobbyService'in RemovePlayerAsync()'ini joinedLobby.Id ve AuthenticationService'deki PlayerId ile kullanıyoruz ve lokal lobbyi nulluyoruz.
+KickPlayer(string playerId) Host ise LobbyService'in RemovePlayerAsync'ini lobyId ve playerId ile çalıştırıyo. 
+Bir de GetLobby var diğer scriptlerde kullanmak için. 
+KitchenGameMultiplayer.cs'de multiplayer ismimizi tutacak playerprefs key'ini const olarak yazmışız. PlayerName'ini privateString olarak tanımlamışız.
+Awake'de PlayerPrefs.Getsring ile playername'ini set ediyoruz. Eğer yoksa da default value olarak bir randomRange generate ediyoruz. 
+GetPlayterName ve setPlayerName fonksiyonları var. Set olanda ayrıca PlayerPrefs'de de kaydediyoruz. 
+Client artık NetworkManager'ın OnClientConnectedCallback'ini takip ediyor. triggerlanınca da SetPlayerNameServerRPC ve SetPlayerIdServerRPC'yi tetikliyor. 
+Birinde Server'a kaydedilmiş adıyla beyanda bulunuyoruz ve playerDataIndexteki playerData.playerName'i editleyip struct'ı tekrar o indise kaydediyoruz.
+Diğerinde de aynı şeyi PlayerId için yapıyoruz. (authenticationService.Instance.PlayerId'den aldığımız). 
+MainMenuCleanUp.cs'de KitchenLobby.Instance null değilse onu da destroy ediyoruz. 
+PlayerData.cs'te struct'a 2 adet FixedString128Byte değişkeni daha tutturuyoruz. (playerName ve PlayerId(authenticationService'den aldığımız) String değil bunu tutturma sebebimiz string de serializable değil çünkü data type değil. 
+FixedString hem sınırlı hem karakter isimleri için yeterli. 
+CharacterSelectUI.cs'de Lobby ismi ve lobi kodu bölümü eklendi (host lobi kurunca görebiliyor). Main menuye dönerken artık KitchenGameLobby'deki LeaveLobby fonksiyonunu da uyguluyoruz.
+Startta ise KitchenGameLobby'nin Lobby verisini alıyoruz. Ekrandaki lobi ismi ve kodu textlerini de lobby.Name ve lobby.LobbyCode'a eşliyoruz.
+ConnectionResponseMessageUI'ın ismi değişti ve LobbyMessageUI.cs oldu. :
+LobbyMessageUI.cs'de eskiden sadece bağlantı hatasında ekrana connection error yazdıran ConnectionResponseMessage'a ek KitchenGameLobby.cs'deki
+OnCreateLobbyStarted, OnCreateLobbyFailed, OnJoinStarted, OnJoinFailed, OnQuickJoinFailed eventlerini de takip ediyor. 
+Bağlamına göre mesajlar gösteriyoruz, OnDestroy'da eventleri lifetime meselesinden dolayı takipten çıkıyoruz. 
+LobbyCreateUI.cs'de lobby scene'in lobi açmalı UI işlerini KitchenGameLobby.cs'deki fonksiyonlara bağlayacak özellikler var. 
+Public ve Private lobby açmada parametreleri değiştirilmiş olarak inputfielddaki.text kısmıyla isimlendirilmiş lobielr açıyor.
+LobbyListSingleUI vertical group yaptıpımız buttonların template'ine(tekil) lobi ismini yazdırıyor. ayrıca bunlar buttondu. SetLobby ile başka bir scriptten üstlerindeki text değiştiriliyor veya bu templateden oluşturulma objeler silinip oluşturuluyor. 
+LobbyUI.cs'de genel olarak lobby scene'in UI işleri halledilir. ManinMenu, CreateLobbyButton,QuickJoin, joinWithCode buttonları
+LobbyCreateUI'ın show hide fonksiyonları, lobbyCodeInput ve PlayerNameInput için ınptfield, lobi listelemek için de lobby container ve template referansları var.
+Buttonlara ana menuye dönme, lobby'e basınca lobbyUI'ı açma, quickJoin ve join with code özellikleri atandı. 
+Startta inputfield'ı KitchenGameMultiplayer'dan doldurup gösteriyor. Aynı zamanda inputField.onvalueChange'e de listener atıyor. Her değişimde KithcenGameMultiplayer.SetPlayerName(string s)'i kullanıyor.
+Lobi listesi değişimine sub oluyor. ve lobi listesini yeni bir liste oluşturup güncelliyor. 
+Lobi listesi değiştiği anda UpdateLobbyList(e.lobbyList) ile uygulanıyor. Burdaki UpdatelobbyList'in amacı ekrandaki verticalGroup'a yeni childObjeler spawnlayıp göstermek. 
+ChildObje template ise geçiyor, değilse yokediyor(tekrar yüklemek ve doğru gösterdiğini garantilemek için). 
+Foreach döngüsü içinde Lobbylistteki tüm lobbyler için lobbytemplate'den lobbycontainer içine instantiate ediyor. 
+SetActive yapıyor ve LobbyListSingleUI'ına erişip .SetLobby(lobby) ile lobisini set ediyor. O da zaten ismini lobby.name ile alıyor. 
+OnDestroy'da da lifetime farklarına korumaya almak için eventlerden unsub oluyoruz. 
+
 Commitle ilgili yorumum:
  
-****COMMIT 17 - 9f8bb1b
--
+****COMMIT 17 - 1c8251a
+-Relay eklemek oldukça kolay. 
+-KitchenGameLobby.cs'de hepsi try catch içinde ve hepsi async fonksiyonlar: 
+Task<Allocation> AllocateRelay() fonksiyonu bir adet allocation döndürüyor. Bu arada async fonksiyonların tipi her zaman Task<T> oluyor. 
+Çünkü Task klassı ayrıca taskın bitmesi durumu gibi konularda fonksiyonlara sahip, eventlere sahip. allocation bizim NetworkManager'ımızdaki Transportumuzu ayarlamak için kullanacağımız class denebilir.
+Relay package'ından gelen RelayService'ın CreateAllocationAsync fonksiyonuyla MaxPlayer -1'lik bir allocation talebinde bulunulur.
+-1 olma sebebi host'un sayısına gerek yok. Sonra bu allocation döndürülür. 
+Task<String> GetRelayJoinCode(allocation allocation) Diğerleri bizim allocation'ımıza bağlansın diye kullanacakları kodu generate ediyor. 
+RelayService'in GetJoinCodeAsync(allooation.allocationId) ile string döndürür. 
+JoinRelayWithCode(string joinCode) da JoinAllocation'ı string kodu ile bulur ve joinAllocation'ı döndürür. 
+CreateLobby fonksiyonu hostun kullanacaği fonksiyon, KitchenGameMultiplayer.cs'in .StartHost()'unu çağırmadan önce alokasyonu alıp kullanmamız lazım.
+AllocateRelay() ile bir alokasyon alıyoruz. GetRelayJoinCode ile bu alokasyonun relay kodunu alıyoruz. 
+///Daha sonra tekrar dönülecek.
+
 Commitle ilgili yorumum: 
 
-****COMMIT 18 - 9f8bb1b
--
-Commitle ilgili yorumum: 
-
-****COMMIT 19 - 9f8bb1b
--
-Commitle ilgili yorumum: 
 
 /WORK IN PROGRESS/
