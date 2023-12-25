@@ -90,7 +90,11 @@ Lokal instance boş değil ise lokal instance'ın OnSelectedCounterChanged'ine s
 -SoundManager artık player'ın OnAnyPickedSomething'ini takip ediyor, sender'ın player.cs'ini alıp o player'ın transformundan ses çıkartıyor. 
 -testingNetcodeUI'da test için host ve client buttonları yapıp lambda expression ile network manager'ın host'unu veya clientını başlatma metodlarını aktive ediyoruz.
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: Multi ve single'ın en büyük farkı client ve serverın cihazlarında çalışacak kodların farklı olması gerektiğini hesaba katmamız gerekmesi.
+Bu hem bazı şeyleri valide etmek hem de bazı şeylerin senkron çalışmasını garantilemek için baştan düşünmemiz gereken engellerle geliyor. DeliveryManager'ın sadece serverda çalışması ve clientlara 
+sonuç raporu iletmesi ve clientların bu sonuca göre ekranda bir şeyler göstermesi sistemlerin çok daha katmanlı olması gerekliliğini getiriyor. 
+Temel olarak her validasyon eğer oynanışı etkiliyorsa server'dan geçecek. ClientNetworkTransform veya OwnerNetworkAnimator aslında client tarafından animasyon ve transformların set edilmesini sağlayacak ek sciptler,
+bunlar da daha hacklenmeye kapalı oyunlar yapmak istiyorsanız server tarafından denetlenmeli ve "Server Authoritative" tasarım seçilmeli. 
 
 ****COMMIT 2 - 2116c71
 -prefablerde networkObject eklemesi
@@ -118,7 +122,11 @@ transformu eşlemeyi bu committe silmiş. bundan sonraki committe düzeltiyorduk
 -Player scripti de artık network object döndürüyor. (çünkü IKitchenObjectParent olduğu için)
 -KitchenObjectListSO'da tüm kitchenObjectlerin listesi var bu sayede indexleriyle ulaşabiliyoruz.
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: networkBehavior olan objelerin yok edilmesi, instantiate edilmesi, parent ataması yapılması ve hiyerarşideki yerlerinin değiştirilmesi gibi operasyonlar 
+server tarafından diğer clientlara bildirilmesi gerektiği için buna yönelik bir tasarım yapıldı. Bunları içeren tüm logiclerin validasyonu ve/veya bildirimi yavaş yavaş ServerRPC'lere çekiliyor. 
+ServerRPC'ye arguman göndermenin de bazı kısıtlamaları var, normalde olduğu gibi her tipten veriye ve her scripte erişmesi kolay değil. Dolayısıyla hem int float gibi basit veri tipleriyle çalışması sağlanmalı
+Hem de NetworkObjectReferance'lar aracılığıyla diğer classlara erişilmeli. Bu da normalde kısacık kodlarla çözülebilecek sorunları 2-3 misli satır ve 2-3 farklı metoddan geçerek çözülmesini sağlıyor. 
+Son derece basit olsa da bir liste içinde lokalde gerekli veriyi tutmak ve index aracılığıyla bu veriyle ulaşmak makul bir çözüm oluyor. 
 
 ****COMMIT 3 - b680efc
 -Counterlara da network object eklendi böylece null döndürmücekler. 
@@ -138,17 +146,22 @@ NetworkObjeden interface'e erişiliyor, kendi kitchenObjectParent'ına girip onu
 en son followTransform.SetTargetTransform ile yeni kitchenObjectin transformuna eşliyoruz. 
 -PlateKitchenObjede de awake'de base.awake'i aldık. Çünkü kitchenObject artık folowTransform'un komponentine orda erişiyor.
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: Temelde diğer oynayıcıların da görmesini istediğimiz ve client tarafından tetiklenen olayların koddaki düzeni:
+1)localPlayer/Client bir logici tetikler ve ServerRPC'ye yönlendirir
+2)ServerRPC valide eder ve/veya NetworkObject davranışlarıyla ilgili bir duruma müdahale eder ve/veya clientRPC'ye yönlendirir
+3)ClientRPC görsel olan tepkiyi verir, örneğin lokal kodda bir eventi tetikler ve/veya bir animasyon oynar, UI açar 
+FollowTransform.cs'in gerekmesinin sebebi, ServerRPC'den geçen ve referans olarak verilen Parent Object'in classına erişsek bile Transform bilgisinin eksik kalması.
+Bu yüzden bu gibi logiclerin baştan düşünülmesi gerekebiliyor. 
 
 ****COMMIT 4 - 8939ac1
--KitchenObject artık DestroySelf'de ClearKitchenObjectParent() yapıp objeyi yok ediyor (client tarafında ama network obje olup serverda bu kod çalıştığı için diğer oyuncularda da kaybolacak)
+-KitchenObject artık DestroySelf'de ClearKitchenObjectParent() yapıp objeyi yok ediyor
 -KitchenGameMultiplayer'da DestroyKitchenObject metodu var ve bu ServerRPC'ye yönlendiriyor, bir network Obje referansından kitchenObjeyi buluyor.
 ClientRPCye ye bu referansı yönlendiriyor bu clientRPC'de parentını clear edecek). sonra da kitchenObject.DestroySelf'i çağırıyor(server tarafında).
 ClearKitchenObjectParentClientRPC ise parametre olan networkObjeden kitcjenObjecti kenara yazıp onlara parentı silmesi için metodu çağırıyor KitchenObject.ClearKitchenObjectParent()
 -Delivery Counter artık KitchenObject'in destroySelf fonksiyonu yerine yeni yazdığımız DestroyKitchenObject statik fonksiyonunu kullanıyor (serverRPC'li)
 -Trash counter da artık destroySelf yerine online olanı kullanıyor ve Interaction sesi için serverRPC/ClientRPC kullanıyor (her oyuncu sesi duysun diye)
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: Bu committe yeni bir konsept yok. daha çok ServerRPC/ClientRPC ve parametre kısıtlamalarının olduğu düzende daha çok uygulama oldu.
 
 ****COMMIT 5 - 2b176a7
 -Cutting Counter içersinde: Normalde eğer doğru bir tarif konulduysa interact içinde çalışan kodu tamamen serverRCP/clientRPClerle çalıştırıyoruz. 
@@ -159,7 +172,8 @@ CutObjectClientRPC'nin içinde lokal olarak cutting progress artıyor ve anycut 
 UI için onProgress change tetikleniyor(burada cuttingProgressMax) için cuttingrecipeSO lazım. 
 TestCuttingProgressDoneServerRPC ise eğer ki cuttingProgressMax'a eşitlenirse outputKitchenObject çıkartma logicini tetikliyor ve var olanı yok edip yenisini instantiate ediyor(server tarafında). 
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: Yeni bir konsept yok. Cutting counter üstüne valid bir obje konulduğu anda tetiklenen serverRPC, diğer clientlara haber verme.
+Kesilme progressinin serverRPC üstünden validasyonunu içeren bir commit. 
 
 ****COMMIT 6 - 43ec82d
 -KitchenGameMultiplayer'daki SO'dan index, indexten SO döndüren fonksiyonlar StoveCounterda kullanılmak üzere privatedan publice çevirildi.
@@ -178,7 +192,8 @@ Interact obje yerleştirince server fryingTimer'ı 0lıyor statei değiştiriyor
 State'i değiştirmek de serverRPC ile yapılabiliyor tam nedenini hatırlamıyorum acaba NetworkVariable'ların tamamı mı öyle idi acaba? 
 BurningRecipeSO ve FryingRecipeSO'yu client tarafına iletmemizin sebebi client tarafında ProgressBarUI'ı tetiklicek eventin argümano olarak fryingtimerMax/burningtimerMax olması. 
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: NetworkVariable<T> kullanımı da data aktarımı için oldukça güçlü bir silah. Hazır gelen .Onvaluechanged eventleriyle pek çok şey yapılabiliyor. 
+State Machine design patternında enum'un network variable olması da işleri epey kolaylaştırıyor. 
 
 ****COMMIT 7 - ac09cdd
 -ClearCounter.cs ve CuttingCounterCounter'da yenilenmiş destroy fonksiyonu kullanımı eklendi.
@@ -188,7 +203,7 @@ client tarafında interact çalışınca bu liste clientta güncellenirken diğe
 bu yüzden malzeme ekleme ve OnIngredientAdded eventlerini direkt client tarafında yapmak yerine bir serverRPC'ye eklenecek malzemenin indexi iletiliyor
 sonrasında o da aynı indexi bir clientRPC ile diğer clientlara iletiyor. Bu clientRPC içersinde de listeye eklenip onIngredientAdded tetikleniyor.
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: Var olan OnIngredientAdded fonksiyonu sadece 1 serverRPC 1 clientRPC'den geçirilerek multide de kullanılabilir hale geldi. Belki de gözde çok büyütülecek bir yanı yoktur. 
 
 ****COMMIT 8- e3fd9e9e40fd9e792c90d11ff319b1cd2c14f415
 -Player prefab'ine mask layer(player)/yeni box collider eklendi çünkü collision için kullanılacak (collisions layer mask hem counters hem players, counters layer mask sadece counters)
@@ -211,7 +226,9 @@ Ayşı şekilde eğer !canMove ise X ve Z eksenlerinde hareketi çek ettiğimiz 
 State değişiminde eğer IsCoundowntoStartActive() ise kendisini saklıyor. Eğer IsLocalPlayerReady() ise kendini gösteriyor(tutorial UI'ı geçince yani)
 
 Commitle ilgili yorumum: 
-
+-Dictionary'ler online oyunlarda herkesin durumunu tutmak için kaçınılmaz bir araç, ayrıca foreach tüm dictionary'nin üstünden geçmek için oyunlarda hiç kullanmadığım kadar sık kullanılıyor. 
+-Monobehaviour'daki execution order'a ek olarak OnNetworkSpawned gibi Netcode'a özel execution fonksiyonları da göz önünde bulundurulmalı, event takibi gibi işlerin nerede yapılacağında dikkat edilmeli.
+-ServerRPCParams'dan serverRPC'yi tetikleyen clientId, NetworkManager.ClientIDs'den de tüm ClientID'leri görebiliyoruz, bunlar daha komplike yapılırda devamlı şekilde kullanacağımız classlar olacak. 
 
 ****COMMIT 9 - 8b31bcd
 -KitchenGameManager.cs'te 4 yeni event. lokalPlayer'ın oyunu durdurup devam ettirdiği veya multiplayer oyunun durup devam ettiği üstüne
@@ -227,7 +244,8 @@ ConnectedClientID'sdeki tüm client ID'lerin üstünden döndürülür, duruma g
 -PauseMultiplayerUI.cs ekranda "waiting for other players to unpause tarzı bir text gösteriyordu. OnlineMultiplayer'ın durdurulup devam etme eventlerini takip ediyor. 
 Duruma göre show hide fonksiyonları devreye giriyor.
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: Geçen committeki tüm oyuncuların hazır olması durumunda oyunun başlaması logici ile nerdeyse aynı şeyi yaptık, pekiştirici oldu. 
+Yeni bir bilgi yok.
 
 ****COMMIT 10 - 9f8bb1b
 -KitchenGameManager.cs start'ta eğer isServer ise bağlantı kopukluklarını takip etmek için NetworkMakager.Singleton.OnClientDisconnectCallback eventi takibe alınır
@@ -243,7 +261,8 @@ Playerların hepsinde çalışan ama sadece server tarafında çalışan bir fun
 Start'da bu NetworkManager.Singleton.OnclientDisconnectCallback'ine sub oluyor. 
 Eğer event triggerlanırsa ve callbackten dönen clientId eğer serverClientId ise hostun bağlantısının koptuğunu oyuncuya söylüyor.
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: Bağlantı kopukluklarında oyunun çökmesine veya tepkisiz kalmasına engel olmak için NetworkManager.OnClientDisconnectCallback'e sub olup kopukluk durumunda tetiklenecek bazı logicler yazıyoruz. 
+Bu logiclere fonksiyonel(pause/unpause/ana menüye dönme özelliği), görsel-boyutsal (gameobject yoketme), UI'sal(bağlantınız koptu uyarısı verme) önlemler sayılabilir.
 
 ****COMMIT 11 - 5c65bea
 -NetwormManager componentinin connection approval boolu 1e alındı böylece herkesin bağlanmasına izin vermicek (oyun başlamışken vermicek)
@@ -255,14 +274,16 @@ Eğer oyun IsWaitingToStart ise connectionApprovalResponse.Approved ve .CreatePl
 StartClient'ta ise basitçe NetworkManager'ın StartClient fonksiyonunu kullanıyoruz. 
 -TestingNetcodeUI.cs'de fonksiyonları direkt çağırmak yerine KitchenGameMultiplayer instance'ı üstünden çağırıyoruz. 
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: Network Manager özelliklerini daha derinlemesine keşfediyoruz. ConnectionApproval gerekliliği bağlanacak clientlara bir filtreleme opsiyonu sunuyor. 
+ConnectionApprovalCallback, bir client bağlanmaya çalışırken request ve response struct'ı gönderiyor. Lokal logiclerle, scene seçimi, bağlı olan clientId'lerin sayısı gibi Response'a Approved değeri atayabiliyoruz. 
+Bu oyun için yapmadık ama ConnectionApprovalRequest struct'ından gelen networkID'yi banlanmış oyuncular listesinde aratarak eğer içerdeyse almayabiliriz. Aklıma gelen bir kullanım oldu. 
 
 ****COMMIT 12 - f323821
 -Scene flow eklendi. bunun için CharacterSelectScene ve LobbyScene eklendi. (main menu> Lobby> game), normalde bağlantı gameScene'de olduğu için bazı gameObjectlerin yerleri değişti vs.
 -KitchenGameManager.cs normalde playerları networkManager'ın PlayerPrefab'inden spawnladığımız ama artık networkManager'ın host bağlandığında spawnlaması saçma olduğundan (scene flow geldi diye)
 artık player prefab'ini kitchenGameManager spawnlıyor. İçinde prefab'e referans verdik. kodu çalıştıran server ise OnNetworkSpawn()'da DisconnectedCallback'e sub olurken
 scene.Singleton.sceneManager.OnLoadEventCompleted'a da sub olur. bu load işlemi gerçekleşince bütün bağlı oan clientID'leri foreachle döndürür
-Onlar için birer playerTransform'u instantiate eder ve NetworkObjectlerine erişip. SpawnPlayerObject(clientId,true) yapar. (bunu daha önce yapmak zorunda değildik çünkü NetworkManager hallediyordu)
+OnLoadCompleted'da Onlar için birer playerTransform'u instantiate eder ve NetworkObjectlerine erişip. SpawnPlayerObject(clientId,true) yapar. (bunu daha önce yapmak zorunda değildik çünkü NetworkManager hallediyordu)
 -KitchenGameMultiplayer.cs'de max player amount const int olarak tanımlanmış. OnTryingToJoin ve OnFailedToJoin eventleri yazılmış.
 Awake'de DontDestroyOnLoad aktif edilmiş, çünkü artık gameMultiplayer lobyde başlıyor, gameScene'e taşınıyor.
 ConnectionApprovalCallback'ini dinleyen func Eğer Scene character select scene değil ise connectionApproval vermiyor., eğer bağlı olan Id'lerin sayısı max sayıdan fazlaysa da vermiyor. 
@@ -279,14 +300,17 @@ Lifetime'ı farklı olduğu için de OnDestroy'da eventlerden unsub oluyor.
 -ConnectionResponseMessageUI.cs de benzer bir class, sadece OnFailedToJoinGame'e sub oluyor. Ve eğer fail olursa
 Show() yapıp ekrandaki mesajı NetworkManager.Singleton.DisconnectReason'a eşliyor. Eğer mesaj boşsa sıradan "Failed to connect" mesajı çıkıyor
 -Main menu'de PlayButton artık Loader.Load game scene'dense lobbyscene'e götürüyor. 
--TestingCharacterSelectUI.cs'de oluşturduğumuz characterSelect scene'i i.inde ready buttonuna sahip bir awake. 
-buttona basınca CharacterSelectReady'nin SetPlayerReady fonksiyonunu yapıyor. 
+-TestingCharacterSelectUI.cs'de oluşturduğumuz characterSelect scene'inde ready buttonuna sahip bir UI scripti.
+Buttona basınca CharacterSelectReady'nin SetPlayerReady fonksiyonunu yapıyor. 
 -TestingLobbyUI.cs'de CreateGame(host) ve JoinGame(client) butonları var. Bunlar KitchenGameMultiplayer.cs'deki hostu çağrıp Character select scene'e gidiyor
 Veya client'ı başlatıyor. (henüz scene değiştirmiyor client. ??? Client serverda loadlu olan scene'i otomatik load ettiği için özellikle scenemanager kodu yazmamıza gerek yokmuş.
 -CharacterSelectReady.cs bir networkbehaviour ve bir static instance'a sahip. awake'de playerReadyDictionary artık burda tutuluyor. 
 Ready olup olmama algoritmasını kitchenGameManager'dan kopyalamışız. 
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: NetworkObject'lerin daha detaylı kullanılması, NetworkObject class'ı detaylı incelenebilir. Scene flow eklemesi yapınca lifetimelar dikkate alınmalı. 
+Gerekli şeyler için dontdestroy on load veya event takip eden ama tek scenede kalan şeyler için OnDestroy'da eventten unsub olmalı. (beklenmedik davranışlar olmasın diye ve memory leake engel olmak için)
+Benzer sebeplerle oyundan ana menüye dönünce instance'lar, singletonlar silinlemi, static eventler resetlenmeli, networkManager shutdown edilmeli.
+Ayrıca bağlantı birkaç saniye sürebildiği için join tuşuna bastığınızda kullanıcıyı uyarıcak UI elemanları göstermek önemli, bağlantı hatası gibi durumlar da bildirilmeli. bu yüzden event sistemleriyle UI emareleri kullanılmalı. 
 
 ****COMMIT 13 - 506cc44
 -Character select scene için visual dummy bir karakter prefabi ürettik.
@@ -304,7 +328,9 @@ Bu bool func'ını CharacterSelectPlayer'ın içinde kullanıyoruz(dummyleri gö
 -CharacterSelectUI.cs'de de main menu ve ready tuşları var. Main menu'ye basınca Loader'dan main menuscene'i açıyor.
 Ready'e basınca da CharacterSelectReady'nin instance'ından setPlayerReady() yapıyor. 
 
-Commitle ilgili yorumum: 
+Commitle ilgili yorumum: Singleplayerdakinin aksine verilen oyuncular arasında paylaşımının kolay olmaması yüzünden Struct'larda tutulması ve listede yer alması son derece kolaylık sunuyor. 
+Ayrıca bu listedeki değişimleri takip etmek için  NetworkList<T>.OnListChanged eventi oldukça kullanım kolaylığı sağlıyor. Herhangi bir veri değişiminden listeyi takipte olan bütün elemanlar kolayca haberdar oluyor. 
+Ekrandaki dummylerin gösterilmesi, isimlerinin anı anına yazdırılması, sonraki güncellemelerde eklenecek renk değişimi gibi her şey bu sayede kolayca uygulanıyor.
 
 ****COMMIT 14 - bd1b4a0
 -Karakter rengini seçmek için UI elemanları ve scene değişimleri yapıldı. Character select scene'ine renk tuşları ve renkler eklendi
@@ -429,13 +455,30 @@ Commitle ilgili yorumum:
 Task<Allocation> AllocateRelay() fonksiyonu bir adet allocation döndürüyor. Bu arada async fonksiyonların tipi her zaman Task<T> oluyor. 
 Çünkü Task klassı ayrıca taskın bitmesi durumu gibi konularda fonksiyonlara sahip, eventlere sahip. allocation bizim NetworkManager'ımızdaki Transportumuzu ayarlamak için kullanacağımız class denebilir.
 Relay package'ından gelen RelayService'ın CreateAllocationAsync fonksiyonuyla MaxPlayer -1'lik bir allocation talebinde bulunulur.
--1 olma sebebi host'un sayısına gerek yok. Sonra bu allocation döndürülür. 
+"-1" olma sebebi host'un sayısına gerek yok. Sonra bu allocation döndürülür. 
 Task<String> GetRelayJoinCode(allocation allocation) Diğerleri bizim allocation'ımıza bağlansın diye kullanacakları kodu generate ediyor. 
 RelayService'in GetJoinCodeAsync(allooation.allocationId) ile string döndürür. 
 JoinRelayWithCode(string joinCode) da JoinAllocation'ı string kodu ile bulur ve joinAllocation'ı döndürür. 
 CreateLobby fonksiyonu hostun kullanacaği fonksiyon, KitchenGameMultiplayer.cs'in .StartHost()'unu çağırmadan önce alokasyonu alıp kullanmamız lazım.
 AllocateRelay() ile bir alokasyon alıyoruz. GetRelayJoinCode ile bu alokasyonun relay kodunu alıyoruz. 
-///Daha sonra tekrar dönülecek.
+Sonra katılmış olduğumuz lobby'yi güncelleyerek RelayJoinCode'unu bir dictionary içinde gönderiyoruz. LobbyService.UpdateLobbyOptions(args) kullanarak
+UpdateLobbyOptions bir dictionary alıyor. String ve DataObject şeklinde. DataObject de Member visibility ve string şeklinde veri tutuyor (kimisine görünemez yapabiliyorsun)
+Sonra NetworkManager'ın UnityTransport componentini alıp .SetRelayServerData ile yeni allocation'ı ve "dtls" / bir kominikasyon protokolu / Datagram Transport Layer Security demekmiş.
+Allocation ayarlandıktan sonra KitchenGameMultiplayer'ın StartHost() unu başlatıyoruz. 
+QuickJoin() ve JoinWithCode() ve JoinWithLobbyId()'de de Lobiye bağlandıktan sonra StartClient()'ı başlatmadan önce bu lobiden alokasyon verisini alıyor. 
+joinedLobby.Data[key name].Value ile bu stringi çekiyoruz ve tutuyoruz. bu kodla lokal JoinRelayWithCode() fonksiyonunu kullanıyoruz ve sonra da NetworkManager'ın UnityTransport'una
+erişip alokasyon datasını değiştiriyoruz. 
+
+Commitle ilgili yorumum: 
+
+****COMMIT 18 - bf61007
+-KitchenGameLobby.cs'de initialization'da her seferinde random profille giriyorduk bu aynı PC'de farklı oturum alabilmek içindi bu kısım silindi.
+-KitchenGameMultiplayer.cs'de SpawnKitchenObjectServerRPC'nin içine bir validasyon sağlamak için RPC'nin içinde bir daha parent objenin bir kitchenObjecti olup olmadığına bakılıyor,
+varsa kod hiçbi şey yapmadan dönüyor. Bunun sebebi eğer servera bağlı olan oyuncu lag varken çok fazla spawn komutu gönderirse server elinde obje var mı bilmeden daha çok spawn yapmaya çalışıp bozuluyordu.
+aynı şey DestroyKitchenObjectServerRpc için de geçerli. lag fazlayken yoketmek için fazla komut gelirse null reference exception geliyordu çünkü çoktan yok olmuş bir objeye yoketme komutu geliyordu.
+-CuttingCounter.cs'te CutObjectServerRPC()'de obje kesmede client tarafında cut emri verilmeden önce counterda KitchenObject olup olmadığına bakılır ve input'u olan kitchenObjectolup olmadığına bakılır.
+Bunun sebebi de gene lagden kaynaklı kesme emirlerinin geç iletilmesi ve çoktan kesilmiş bir objeyi tekrar kesme emri gitmesi gibi durumların önğne geçmek için. 
+TestCuttingProgressDoneServerRpc()'de de ekstra validasyon yapıyoruz validasyonu yaptıktan sonra cuttingRecipeSO'yu alıyoruz. bu da gene lag ve jitterın yaratabileceği sorunların önüne geçmek için.
 
 Commitle ilgili yorumum: 
 
