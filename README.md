@@ -2,91 +2,91 @@
 
 <img src="Assets/_Assets/Textures/KitchenChaosLogo.png" width="550">
 
- This project is based on Code Monkey's step-by-step tutorial on how to use Unity's netcode for game objects, lobby, and relay packages. Here is the link: https://www.youtube.com/watch?v=7glCsF9fv3s
- 
-This game project started as a single-player-only game; later on, netcode support was added. I've also uploaded the complete single-player repository on GitHub: https://github.com/OzgenKoklu/KitchenChaosSingleplayer
+**ABOUT THE PROJECT:** This project is based on Code Monkey's step-by-step tutorial on how to use Unity's netcode for game objects, lobby, and relay packages. You can find it [here.](https://www.youtube.com/watch?v=7glCsF9fv3s) This game project started as a single-player-only game; later on, netcode support was added. I've also uploaded the complete single-player repository on GitHub, [here.](https://github.com/OzgenKoklu/KitchenChaosSingleplayer) In this readme, I only mention the Netcode/Lobby/Relay-related features and coding. The repository for the single-player project includes details on the main game mechanics.
 
-In this readme, I only mention the Netcode/Lobby/Relay-related features and coding. The repository for the single-player project includes details on the main game mechanics.
-
-**Disclaimer:** All assets were borrowed from Code Monkey and are not intended for commercial use. This is a learning project, and I've built it independently under instructions from Code Monkey.
- 
+**Disclaimer:** All assets were borrowed from Code Monkey and are not intended for commercial use. This is a learning project, and I've built it independently under instructions from Code Monkey. 
 This build won't run on your computer as is unless linked to Unity Services. To link, go to Edit > Project Settings > Services and connect to a project where Lobby and Relay services are enabled.
 
-**ABOUT THE GAME:** This is a small-scale casual game highly inspired by OverCooked, where you must deliver specific orders within a time limit.
+**ABOUT THE GAME:** This is a small-scale casual game highly inspired by OverCooked, where you must deliver specific orders within a time limit. 
+It is a complete package with scene cycles, sound and animation, an options menu, savable settings, and key bindings, with added multiplayer!"
 
- It is a complete package with scene cycles, sound and animation, an options menu, savable settings, and key bindings, with added multiplayer!"
+---
+**TLDR:**  In Short, what I've learned from this project:
 
+**1.** Implementing Netcode for GameObject, Lobby & Relay by Unity into an already existing single-player game.
+
+**2.** Gaining a basic understanding of multiplayer game logic, including server/client authoritative design, RPCs, and basic solutions for poor connections.
+
+**3.** Creating a fully functional game scene flow using Netcode for GameObjects, and subsequently utilizing lobby and relay services to enable online connectivity.
+
+---
 # Images
 
-Main Menu: \
-<img src="ReadmeMedia/png/1.MainMenu.png" width="450"> \
+Main Menu
 
-Lobby List UI: \
-<img src="ReadmeMedia/png/2.LobbyList.png" width="450"> \
+<img src="ReadmeMedia/png/1.MainMenu.PNG" width="450"> 
 
-Character Select Scene: \
-<img src="ReadmeMedia/png/3.CharacterSelectScene.png" width="450"> \
+Lobby List UI
 
-Settings UI: \
-<img src="ReadmeMedia/png/4.SettingsUI.png" width="450"> 
+<img src="ReadmeMedia/png/2.LobbyList.PNG" width="450"> 
+
+Character Select Scene
+
+<img src="ReadmeMedia/png/3.CharacterSelectScene.PNG" width="450"> 
+
+Settings UI
+
+<img src="ReadmeMedia/png/4.GameScene.PNG" width="450"> 
 
 
 # GIFs
 
-Gameplay \
+Gameplay 
+
 <img src="ReadmeMedia/gif/2.Gameplay.gif" width="450"> \
 
-Character Select Screen \
+Character Select Screen 
+
 <img src="ReadmeMedia/gif/1.CharacterSelect.gif" width="450"> 
 
 # Youtube Video
-Entire game loop can be viewed in this youtube video:  \
+
+Entire game loop can be viewed in this youtube video:
+
 [![Youtube Link](https://img.youtube.com/vi/lrHCDELBiAE/0.jpg)](https://youtu.be/lrHCDELBiAE)
 
-
-**TLDR:**  In Short, what I've learned from this project:\
--Implementing Netcode for GameObject, Lobby & Relay by Unity into an already existing single-player game.\
--Gaining a basic understanding of multiplayer game logic, including server/client authoritative design, RPCs, and basic solutions for poor connections.\
--Creating a fully functional game scene flow using Netcode for GameObjects, and subsequently utilizing lobby and relay services to enable online connectivity.\
+---
 
 **On my decision to separate the project into two repositories:**
 
-Short answer: The source code changed too much. Since I'm relatively new to multiplayer development, I'm not familiar with the structures and design choices implemented in its current state.
+**Short answer:** *The source code changed too much.* 
 
-Before this project, I hadn't worked on any multiplayer game projects. I had heard of Photon Network, which I believe is still a popular option for creating multiplayer games.
+Since I'm relatively new to multiplayer development, I'm not familiar with the structures and design choices implemented in its current state. Before this project, I hadn't worked on any multiplayer game projects. I had heard of Photon Network, which I believe is still a popular option for creating multiplayer games. The architectural requirements for a multiplayer game are entirely different, and the programmer must decide whether the game will be server authoritative or client authoritative, a decision that significantly impacts the project's structure. In single-player games, especially when you are at the very beginning of your developer journey, you mainly deal with what's on the screen, adjusting behaviors to make the gameplay. However, for multiplayer development, the entire communication process must be carefully thought out. There's an essence of backend development in this sense, where requests should be handled in particular ways. This project helped me further understand C# and OOP concepts. I grasped them while building it, but I still feel somewhat unfamiliar.
 
-The architectural requirements for a multiplayer game are entirely different, and the programmer must decide whether the game will be server authoritative or client authoritative, a decision that significantly impacts the project's structure.
-
-In single-player games, especially when you are at the very beginning of your developer journey, you mainly deal with what's on the screen, adjusting behaviors to make the gameplay. However, for multiplayer development, the entire communication process must be carefully thought out. There's an essence of backend development in this sense, where requests should be handled in particular ways.
-
-This project helped me further understand C# and OOP concepts. I grasped them while building it, but I still feel somewhat unfamiliar.
-
-
+---
 # More about what's covered in this project for those with more time:
 
-The project is a course project by Code Monkey, and its curriculum can be found at this link: https://unitycodemonkey.com/kitchenchaosmultiplayercourse.php
+The project is a course project by Code Monkey, and its curriculum can be found [here.](https://unitycodemonkey.com/kitchenchaosmultiplayercourse.php) However, I want to revisit my own commits and create my own list of what I've learned:
 
-However, I want to revisit my own commits and create my own list of what I've learned:
-
-**What I've learned:** 
+# **What I've learned:** 
 
 # UNITY NETCODE FOR GAMEOBJECTS PACKAGE
 
-**1)** ServerRPC/ClientRPC's, and how to set up a basic multiplayer architecture. 
+**1.** ServerRPC/ClientRPC's, and how to set up a basic multiplayer architecture. 
 
-**2)** Server Authoritative/Client Authoritative meaning and usage.
+**2.** Server Authoritative/Client Authoritative meaning and usage.
 
 **Note:** The biggest difference between multiplayer and single-player is that we need to consider that the code running on the client and server devices should be different. This comes with challenges that require us to rethink from the beginning to both validate certain aspects and ensure the synchronous operation of certain elements. For example, the requirement for the DeliveryManager to only operate on the server and relay result reports to clients, with clients displaying things on the screen based on these results, necessitates more layered systems.
 
 Fundamentally, every validation that affects gameplay should go through the server. Scripts like ClientNetworkTransform or OwnerNetworkAnimator, which essentially allow the setting of animations and transforms on the client side, should be controlled by the server if you want to make games that are more resistant to hacking and choose a "Server Authoritative" design.
 
-**3)** NetworkBehaviour class and some of its functions. (OnNetworkSpawned(), isServer isOwner bool etc)
+**3.** NetworkBehaviour class and some of its functions. (OnNetworkSpawned(), isServer isOwner bool etc)
 
-**4)** NetworkObject, NetworkManager's functions: StartHost(), StartClient()
+**4.** NetworkObject, NetworkManager's functions: StartHost(), StartClient()
 
-**5)** Spawning Network Objects. 
+**5.** Spawning Network Objects. 
 
-**6)** Network Friendly data sharing: NetworkObjectReference, basic value types, local functions that aid this process. (index > scriptableObject, scriptableObject > index etc)
+**6.** Network Friendly data sharing: NetworkObjectReference, basic value types, local functions that aid this process. (index > scriptableObject, scriptableObject > index etc)
 
 
 **Note:** Operations on objects with NetworkBehavior, such as destruction, instantiation, parent assignment, and changes in hierarchy, need to be communicated to other clients by the server. Therefore, a design has been implemented to gradually shift all logics involving these operations towards validation and/or notification through ServerRPCs.\
@@ -118,7 +118,7 @@ the Transform information is incomplete. Therefore, rethinking such logics may b
     }
 ```
 
-**7)** Multiplayer Game Logic flow, How to use timers in online and when to trigger serverRPC/ClientRPC.\
+**7.** Multiplayer Game Logic flow, How to use timers in online and when to trigger serverRPC/ClientRPC.\
 
 **Note:** In essence, the organization of events triggered by the client that we want other players to see, and the code structure of these events:
 
@@ -126,13 +126,13 @@ the Transform information is incomplete. Therefore, rethinking such logics may b
 **Step 2)** ServerRPC validates and/or intervenes in a situation related to NetworkObject behaviors, and/or directs it to clientRPC.\
 **Step 3)** ClientRPC provides a visual response, such as triggering an event in local code and/or playing an animation, opening UI.
 
-In addition to the execution order in MonoBehaviour, special Netcode-specific execution functions such as OnNetworkSpawned should also be taken into account. Attention should be paid to where tasks such as event tracking should be performed.\
+In addition to the execution order in MonoBehaviour, special Netcode-specific execution functions such as OnNetworkSpawned should also be taken into account. Attention should be paid to where tasks such as event tracking should be performed.
 
-**8)** NetworkVariable<T> for value types, including enums. Great for state machine design pattern and holding float timers. Comes with its own event .OnValueChanged 
+**8.** NetworkVariable<T> for value types, including enums. Great for state machine design pattern and holding float timers. Comes with its own event .OnValueChanged 
 
-**9)** Usage of Dictionary<TKey, TValue>, for player status registiration.
+**9.** Usage of Dictionary<TKey, TValue>, for player status registiration.
 
-**10)** Logic that includes clientID's: serverRPCparams, NetworkManager.ClientIDs.
+**10.** Logic that includes clientID's: serverRPCparams, NetworkManager.ClientIDs.
 
 **Code Snippet 2:** Usage of dictionaries and ClientIds from Assets/Scripts/KitchenGameManager.cs\
 ```csharp
@@ -154,13 +154,13 @@ In addition to the execution order in MonoBehaviour, special Netcode-specific ex
     }
 }
 ```
-**11)** Handling Disconnects via NetworkManager's "OnClientDisconnectCallback" and connections via NetworkManager's "OnClientConnectedCallback":
+**11.** Handling Disconnects via NetworkManager's "OnClientDisconnectCallback" and connections via NetworkManager's "OnClientConnectedCallback":
 
 **Note:** To prevent the game from crashing or becoming unresponsive during connection disruptions and when the connection is established, we subscribe to these callbacks and write some logics that will be triggered in case of disconnection or connection status. 
 
 These logics may include functional aspects (such as pause/unpause/return to the main menu feature), visual-dimensional aspects (destroying game objects), and UI-related measures (displaying a disconnection alert).
 
-**12)** Connection Approval, getting more function out of the Network Manager: 
+**12.** Connection Approval, getting more function out of the Network Manager: 
 
 **Note:** We are delving deeper into the features of the Network Manager. The requirement for ConnectionApproval provides an option to filter clients attempting to connect.
 
@@ -195,13 +195,13 @@ Although not implemented for this game, a possible use case could involve checki
         connectionApprovalResponse.Approved = true;
     }
 ```
-**13)** Scene flow handling in multiplayer projects: NetworkManager.SceneManager.LoadScene(), SceneManager.OnLoadEventCompleted, NetworkObject.SpawnPlayerObject()
+**13.** Scene flow handling in multiplayer projects: NetworkManager.SceneManager.LoadScene(), SceneManager.OnLoadEventCompleted, NetworkObject.SpawnPlayerObject()
 
 When adding scene flow, lifetimes should be taken into account. For necessary elements, 'DontDestroyOnLoad' may be used, or for things that follow events but remain in a single scene, unsubscribing from events should be done in OnDestroy (to prevent unexpected behaviors and avoid memory leaks).
 
 For similar reasons, when transitioning from the game to the main menu, instances and singletons should be cleared, static events reset, and the NetworkManager should be shut down. Additionally, since the connection can take a few seconds, it's important to display UI elements that alert the user when pressing the join button and provide notifications for connection errors. Therefore, UI indicators should be implemented using event systems.
 
-**14)** Using Struct's to share data in multiplayer game logic. 
+**14.** Using Struct's to share data in multiplayer game logic. 
 
 **Code Snippet 4:** Usage of struct for storing player data from Assets/Scripts/PlayerData.cs
 
@@ -289,26 +289,26 @@ public int GetPlayerDataIndexFromClientId(ulong clientId)
     }
 
 ```
-**15)** Can custumize StartHost() and StartClient() so that host and client can respond differently to a callback or event. 
+**15.** Can custumize StartHost() and StartClient() so that host and client can respond differently to a callback or event. 
 
 In adition, the idea of introducing a 'kickPlayer' feature in the 'IsServer' state, where custom UI boxes can be displayed for both hosts and clients, has the potential to enrich the game. Having the same event yield different results on the server and client sides is also a promising use case. 
 
-**16)** Extra validations, null checks or double checks needed to prevent bugs in multiplayer where connection isn't always perfect.
+**16.** Extra validations, null checks or double checks needed to prevent bugs in multiplayer where connection isn't always perfect.
 
 
 # UNITY LOBBY PACKAGE
 
-**1)** Using Unity's official Lobby package, understanding basic concepts about lobby
+**1.** Using Unity's official Lobby package, understanding basic concepts about lobby
 
-**2)** LobbyService class methods and properties: SendHeartbeatPingAsync(), CreateLobbyAsync(), UpdateLobbyAsync(lobby.id, updateLobbyOptions), QuickJoinLobbyAsync(), DeleteLobbyAsync() etc.  
+**2.** LobbyService class methods and properties: SendHeartbeatPingAsync(), CreateLobbyAsync(), UpdateLobbyAsync(lobby.id, updateLobbyOptions), QuickJoinLobbyAsync(), DeleteLobbyAsync() etc.  
 
-**3)** Lobby class and its properties: .HostId, .Id, .Data[TKey].Value, 
+**3.** Lobby class and its properties: .HostId, .Id, .Data[TKey].Value, 
 
-**4)** AuthenticationService class methods and properties: SignInAnonymouslyAsync(), IsSignedIn, PlayerId 
+**4.** AuthenticationService class methods and properties: SignInAnonymouslyAsync(), IsSignedIn, PlayerId 
 
-**5)** Searching Lobbies: LobbyService.QueryLobbiesAsync(), QueryFilter class, queryResponse class
+**5.** Searching Lobbies: LobbyService.QueryLobbiesAsync(), QueryFilter class, queryResponse class
 
-**6)** Async methods with await
+**6.** Async methods with await
 
 
 **Note:** Implementation of procedures for lobby usage that serves as a clear example. It provides a superficial application of what lobbies are responsible for, what features they have, and what factors can affect them.
@@ -319,13 +319,13 @@ In my opinion, it is remarkably easy to use. For now, there is no need to memori
 
 # UNITY RELAY PACKAGE
 
-**1)** Using Unity's official Relay package, understanding basic concepts about relay
+**1.** Using Unity's official Relay package, understanding basic concepts about relay
 
-**2)** RelayService class methods and properties: CreateAllocationAsync(), GetJoinCodeAsync(), JoinAllocationAsync()
+**2.** RelayService class methods and properties: CreateAllocationAsync(), GetJoinCodeAsync(), JoinAllocationAsync()
 
-**3)** Using Allocation for setting server data of the UnityTransport.
+**3.** Using Allocation for setting server data of the UnityTransport.
 
-**4)** Task<T> return type for async funcions.
+**4.** Task<T> return type for async funcions.
 
 Example code that uses lobby and relay services together.
 
