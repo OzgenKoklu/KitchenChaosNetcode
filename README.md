@@ -1,68 +1,104 @@
-# CodeMonkey2023-Overcooked-Clone Online with netcode / Lobby / relay
+# Kitchen Chaos Online with netcode for gameObjects, Lobby & relay
 
-/WORK IN PROGRESS/
- This is the multiplayer complete tutorial covered by Code Monkey in this video: https://www.youtube.com/watch?v=7glCsF9fv3s
-This game project started as a Singleplayer only game, then netcode support was added later on, I've also uploaded the complete sinpleplayer repo in github: https://github.com/OzgenKoklu/KitchenChaosSingleplayer
-In this readme, I only mention the Netcode/Lobby/Relay related features and coding, the repository for Singleplayer project include the details on main game mechanics.
+<img src="Assets/_Assets/Textures/KitchenChaosLogo.png" width="550">
 
-Disclaimer: All assets were borrowed from Code Monkey and are not used for commercial use, this is a learning project and I've built this on my own under instructions by Code Monkey. 
-This built wont run on your computer as is unless linked to Unity Services, to link go to Edit > Project Settings > Services and link to a project in which Lobby and Relay services are enabled.
+ This project is based on Code Monkey's step-by-step tutorial on how to use Unity's netcode for game objects, lobby, and relay packages. Here is the link: https://www.youtube.com/watch?v=7glCsF9fv3s
+ 
+This game project started as a single-player-only game; later on, netcode support was added. I've also uploaded the complete single-player repository on GitHub: https://github.com/OzgenKoklu/KitchenChaosSingleplayer
 
-ABOUT THE GAME: This is a small scale casual game that is highly inspired by OverCooked, where you have to deliver specific orders in a time limit. 
-It is a complete package with scene cycle, sound and animation, options menu, savable settings and key bindings with added multiplayer! 
+In this readme, I only mention the Netcode/Lobby/Relay-related features and coding. The repository for the single-player project includes details on the main game mechanics.
 
-/IMAGES AND VIDEO TO BE ADDED/\
-Screenshots: \
--main menu ss\
--lobby list ss\
--lobby scene ss\
--Game play ss
+**Disclaimer:** All assets were borrowed from Code Monkey and are not intended for commercial use. This is a learning project, and I've built it independently under instructions from Code Monkey.
+ 
+This build won't run on your computer as is unless linked to Unity Services. To link, go to Edit > Project Settings > Services and connect to a project where Lobby and Relay services are enabled.
 
-Videos & Gifs: 
--Lobby color change gif\
--Gameplay gif \
+**ABOUT THE GAME:** This is a small-scale casual game highly inspired by OverCooked, where you must deliver specific orders within a time limit.
 
--YT Link: 
+ It is a complete package with scene cycles, sound and animation, an options menu, savable settings, and key bindings, with added multiplayer!"
 
-TLDR: In Short: What I've learned from this project:\
--Implementing Netcode For Gameobject, Lobby & Relay by Unity to an already existing singleplayer game\
--Basic understanding of multiplayer game logic: Server/Client authoritative design meaning, RPC's, basic solutions for bad connection\
--Making a fully working game scene flow using netcode for gameObjects, then using lobby and relay services to connect online\
+# Images
 
-On my decision to seperate the project in two repositories:
-Short answer: The source code changed too much. And since I'm much new to multiplayer development, I'm not much familiar with structures and design choiches that were implemented in this current state.\
-Before this project, I havent done any multiplayer game project, I've heard of Photon Network and I think it still is a very popular option to make a multiplayer game.\
-The architectural needs of a multiplayer game is completely different and the programmer has to decide whether the game would be server authoritative or client authoritative and this alone changes the structure of the project. \
-In singleplayer games, especially when you are in the very beggining in your developer journey, you only deal with whats on the screen, you make things change in behaviour to make the game play, however, \
-the entire communication has to be tought out clearly for multiplayer development. Theres some essence of backend development in this sense where requests should be dealt with in particular ways. \
-This project helped me further understand the C# and OOP concepts, I've understood while building it, but yet I feel unfamiliar still.\
+Main Menu: \
+<img src="ReadmeMedia/png/1.MainMenu.png" width="450"> \
 
-More about whats covered in this project for those who have more time: \
-The project is a course project by Code Monkey and has its curriculum in this link: https://unitycodemonkey.com/kitchenchaosmultiplayercourse.php\
-However, I want to re-visit my own commits and make my own list of what I've learned:
+Lobby List UI: \
+<img src="ReadmeMedia/png/2.LobbyList.png" width="450"> \
 
-What I've learned: \
--ServerRPC/ClientRPC's and how to set up a basic multiplayer architecture \
--Server Authoritative/Client Authoritative meaning and usage\
+Character Select Scene: \
+<img src="ReadmeMedia/png/3.CharacterSelectScene.png" width="450"> \
 
-***Translate this
-1) Multi ve single'ın en büyük farkı client ve serverın cihazlarında çalışacak kodların farklı olması gerektiğini hesaba katmamız gerekmesi.\
-Bu hem bazı şeyleri valide etmek hem de bazı şeylerin senkron çalışmasını garantilemek için baştan düşünmemiz gereken engellerle geliyor. DeliveryManager'ın sadece serverda çalışması ve clientlara \
-sonuç raporu iletmesi ve clientların bu sonuca göre ekranda bir şeyler göstermesi sistemlerin çok daha katmanlı olması gerekliliğini getiriyor. \
-Temel olarak her validasyon eğer oynanışı etkiliyorsa server'dan geçecek. ClientNetworkTransform veya OwnerNetworkAnimator aslında client tarafından animasyon ve transformların set edilmesini sağlayacak ek sciptler,\
-bunlar da daha hacklenmeye kapalı oyunlar yapmak istiyorsanız server tarafından denetlenmeli ve "Server Authoritative" tasarım seçilmeli. \
+Settings UI: \
+<img src="ReadmeMedia/png/4.SettingsUI.png" width="450"> 
 
--NetworkBehaviour class and some of its functions (OnNetworkSpawned(), isServer isOwner bool etc)\
--NetworkObject, NetworkManager's functions: StartHost(), StartClient()\
--Spawning Network Objects \
--Network Friendly data sharing: NetworkObjectReference, basic value types, local functions that aid this process. (index > scriptableObject, scriptableObject > index etc)\
 
-***Translate this
-2) networkBehavior olan objelerin yok edilmesi, instantiate edilmesi, parent ataması yapılması ve hiyerarşideki yerlerinin değiştirilmesi gibi operasyonlar 
-server tarafından diğer clientlara bildirilmesi gerektiği için buna yönelik bir tasarım yapıldı. Bunları içeren tüm logiclerin validasyonu ve/veya bildirimi yavaş yavaş ServerRPC'lere çekiliyor. 
-ServerRPC'ye arguman göndermenin de bazı kısıtlamaları var, normalde olduğu gibi her tipten veriye ve her scripte erişmesi kolay değil. Dolayısıyla hem int float gibi basit veri tipleriyle çalışması sağlanmalı
-Hem de NetworkObjectReferance'lar aracılığıyla diğer classlara erişilmeli. Bu da normalde kısacık kodlarla çözülebilecek sorunları 2-3 misli satır ve 2-3 farklı metoddan geçerek çözülmesini sağlıyor. 
-Son derece basit olsa da bir liste içinde lokalde gerekli veriyi tutmak ve index aracılığıyla bu veriyle ulaşmak makul bir çözüm oluyor. 
+# GIFs
+
+Gameplay \
+<img src="ReadmeMedia/gif/2.Gameplay.gif" width="450"> \
+
+Character Select Screen \
+<img src="ReadmeMedia/gif/1.CharacterSelect.gif" width="450"> 
+
+# Youtube Video
+Entire game loop can be viewed in this youtube video:  \
+[![Youtube Link](https://img.youtube.com/vi/lrHCDELBiAE/0.jpg)](https://youtu.be/lrHCDELBiAE)
+
+
+**TLDR:**  In Short, what I've learned from this project:\
+-Implementing Netcode for GameObject, Lobby & Relay by Unity into an already existing single-player game.\
+-Gaining a basic understanding of multiplayer game logic, including server/client authoritative design, RPCs, and basic solutions for poor connections.\
+-Creating a fully functional game scene flow using Netcode for GameObjects, and subsequently utilizing lobby and relay services to enable online connectivity.\
+
+**On my decision to separate the project into two repositories:**
+
+Short answer: The source code changed too much. Since I'm relatively new to multiplayer development, I'm not familiar with the structures and design choices implemented in its current state.
+
+Before this project, I hadn't worked on any multiplayer game projects. I had heard of Photon Network, which I believe is still a popular option for creating multiplayer games.
+
+The architectural requirements for a multiplayer game are entirely different, and the programmer must decide whether the game will be server authoritative or client authoritative, a decision that significantly impacts the project's structure.
+
+In single-player games, especially when you are at the very beginning of your developer journey, you mainly deal with what's on the screen, adjusting behaviors to make the gameplay. However, for multiplayer development, the entire communication process must be carefully thought out. There's an essence of backend development in this sense, where requests should be handled in particular ways.
+
+This project helped me further understand C# and OOP concepts. I grasped them while building it, but I still feel somewhat unfamiliar.
+
+
+# More about what's covered in this project for those with more time:
+
+The project is a course project by Code Monkey, and its curriculum can be found at this link: https://unitycodemonkey.com/kitchenchaosmultiplayercourse.php
+
+However, I want to revisit my own commits and create my own list of what I've learned:
+
+**What I've learned:** 
+
+# UNITY NETCODE FOR GAMEOBJECTS PACKAGE
+
+**1)** ServerRPC/ClientRPC's, and how to set up a basic multiplayer architecture. 
+
+**2)** Server Authoritative/Client Authoritative meaning and usage.
+
+**Note:** The biggest difference between multiplayer and single-player is that we need to consider that the code running on the client and server devices should be different. This comes with challenges that require us to rethink from the beginning to both validate certain aspects and ensure the synchronous operation of certain elements. For example, the requirement for the DeliveryManager to only operate on the server and relay result reports to clients, with clients displaying things on the screen based on these results, necessitates more layered systems.
+
+Fundamentally, every validation that affects gameplay should go through the server. Scripts like ClientNetworkTransform or OwnerNetworkAnimator, which essentially allow the setting of animations and transforms on the client side, should be controlled by the server if you want to make games that are more resistant to hacking and choose a "Server Authoritative" design.
+
+**3)** NetworkBehaviour class and some of its functions. (OnNetworkSpawned(), isServer isOwner bool etc)
+
+**4)** NetworkObject, NetworkManager's functions: StartHost(), StartClient()
+
+**5)** Spawning Network Objects. 
+
+**6)** Network Friendly data sharing: NetworkObjectReference, basic value types, local functions that aid this process. (index > scriptableObject, scriptableObject > index etc)
+
+
+**Note:** Operations on objects with NetworkBehavior, such as destruction, instantiation, parent assignment, and changes in hierarchy, need to be communicated to other clients by the server. Therefore, a design has been implemented to gradually shift all logics involving these operations towards validation and/or notification through ServerRPCs.\
+
+There are some limitations to sending arguments to ServerRPC; it's not as straightforward as accessing any data type and any script. Hence, it should work with simple data types like int and float, and access other classes through NetworkObjectReference.\
+
+This, however, results in solving problems that could be handled with concise code into longer lines and passing through 2-3 different methods (like shown in Code Snippet 1), even though they are seemingly simple issues. While it may be straightforward, keeping the necessary data locally in a list and accessing it through an index can be a reasonable solution.\
+
+Another example is, when kitchenObject sets its parent, it selected its transform directly, for online the reason FollowTransform.cs is necessary is that even if we have access to the class of the Parent Object passed through ServerRPC as a reference, 
+the Transform information is incomplete. Therefore, rethinking such logics may be necessary from the beginning.
+
+**Code Snippet 1:** From Assets/Scripts/KitchenGameMultiplayer.cs, SpawnKitchenObjectServerRpc() 
 
 ```csharp
    [ServerRpc(RequireOwnership = false)]
@@ -82,19 +118,23 @@ Son derece basit olsa da bir liste içinde lokalde gerekli veriyi tutmak ve inde
     }
 ```
 
--Multiplayer Game Logic flow: How to use timers in online and when to trigger serverRPC/ClientRPC.\
-***Translate this
-3) Temelde diğer oynayıcıların da görmesini istediğimiz ve client tarafından tetiklenen olayların koddaki düzeni:\
--1)localPlayer/Client bir logici tetikler ve ServerRPC'ye yönlendirir\
--2)ServerRPC valide eder ve/veya NetworkObject davranışlarıyla ilgili bir duruma müdahale eder ve/veya clientRPC'ye yönlendirir\
--3)ClientRPC görsel olan tepkiyi verir, örneğin lokal kodda bir eventi tetikler ve/veya bir animasyon oynar, UI açar \
-FollowTransform.cs'in gerekmesinin sebebi, ServerRPC'den geçen ve referans olarak verilen Parent Object'in classına erişsek bile Transform bilgisinin eksik kalması.\
-Bu yüzden bu gibi logiclerin baştan düşünülmesi gerekebiliyor. \
+**7)** Multiplayer Game Logic flow, How to use timers in online and when to trigger serverRPC/ClientRPC.\
 
--NetworkVariable<T> for value types, including enums. Great for state machine design pattern and holding float timers. Comes with its own event .OnValueChanged \
--Usage of Dictionary<TKey, TValue>, for player status registiration\
--Logic that includes clientID's: serverRPCparams, NetworkManager.ClientIDs\
+**Note:** In essence, the organization of events triggered by the client that we want other players to see, and the code structure of these events:
 
+**Step 1)** The local player/client/server triggers a logic and directs it to ServerRPC.\
+**Step 2)** ServerRPC validates and/or intervenes in a situation related to NetworkObject behaviors, and/or directs it to clientRPC.\
+**Step 3)** ClientRPC provides a visual response, such as triggering an event in local code and/or playing an animation, opening UI.
+
+In addition to the execution order in MonoBehaviour, special Netcode-specific execution functions such as OnNetworkSpawned should also be taken into account. Attention should be paid to where tasks such as event tracking should be performed.\
+
+**8)** NetworkVariable<T> for value types, including enums. Great for state machine design pattern and holding float timers. Comes with its own event .OnValueChanged 
+
+**9)** Usage of Dictionary<TKey, TValue>, for player status registiration.
+
+**10)** Logic that includes clientID's: serverRPCparams, NetworkManager.ClientIDs.
+
+**Code Snippet 2:** Usage of dictionaries and ClientIds from Assets/Scripts/KitchenGameManager.cs\
 ```csharp
  private Dictionary<ulong, bool> playerPausedDictionary;
 
@@ -114,20 +154,22 @@ Bu yüzden bu gibi logiclerin baştan düşünülmesi gerekebiliyor. \
     }
 }
 ```
-****Translate this
--Monobehaviour'daki execution order'a ek olarak OnNetworkSpawned gibi Netcode'a özel execution fonksiyonları da göz önünde bulundurulmalı, event takibi gibi işlerin nerede yapılacağında dikkat edilmeli.\
+**11)** Handling Disconnects via NetworkManager's "OnClientDisconnectCallback" and connections via NetworkManager's "OnClientConnectedCallback":
 
+**Note:** To prevent the game from crashing or becoming unresponsive during connection disruptions and when the connection is established, we subscribe to these callbacks and write some logics that will be triggered in case of disconnection or connection status. 
 
--Handling Disconnects via NetworkManager's "OnClientDisconnectCallback":
+These logics may include functional aspects (such as pause/unpause/return to the main menu feature), visual-dimensional aspects (destroying game objects), and UI-related measures (displaying a disconnection alert).
 
--Handling connections via NetworkManager's "OnClientConnectedCallback":
+**12)** Connection Approval, getting more function out of the Network Manager: 
 
-****Translate this
-- Bağlantı kopukluklarında oyunun çökmesine veya tepkisiz kalmasına engel olmak için NetworkManager.OnClientDisconnectCallback'e sub olup kopukluk durumunda tetiklenecek bazı logicler yazıyoruz. 
-Bu logiclere fonksiyonel(pause/unpause/ana menüye dönme özelliği), görsel-boyutsal (gameobject yoketme), UI'sal(bağlantınız koptu uyarısı verme) önlemler sayılabilir.
+**Note:** We are delving deeper into the features of the Network Manager. The requirement for ConnectionApproval provides an option to filter clients attempting to connect.
 
+The ConnectionApprovalCallback sends a request and response struct when a client attempts to connect. With local logics, such as scene selection and the number of connected client IDs, we can assign the value 'Approved' to the Response.
 
--More functions of the Network Manager: Connection Approval 
+Although not implemented for this game, a possible use case could involve checking the networkID from the ConnectionApprovalRequest struct against a list of banned players. If the player is in the list, we may choose not to allow the connection. This is one potential application that comes to mind.
+
+**Code Snippet 3:** From Assets/Scripts/KitchenGameMultiplayer.cs, usage of connection approval
+
 ```csharp
 	public void StartHost()
 		{
@@ -153,27 +195,15 @@ Bu logiclere fonksiyonel(pause/unpause/ana menüye dönme özelliği), görsel-b
         connectionApprovalResponse.Approved = true;
     }
 ```
-Translate:
-exp Network Manager özelliklerini daha derinlemesine keşfediyoruz. ConnectionApproval gerekliliği bağlanacak clientlara bir filtreleme opsiyonu sunuyor. 
-ConnectionApprovalCallback, bir client bağlanmaya çalışırken request ve response struct'ı gönderiyor. Lokal logiclerle, scene seçimi, bağlı olan clientId'lerin sayısı gibi Response'a Approved değeri atayabiliyoruz. 
-Bu oyun için yapmadık ama ConnectionApprovalRequest struct'ından gelen networkID'yi banlanmış oyuncular listesinde aratarak eğer içerdeyse almayabiliriz. Aklıma gelen bir kullanım oldu. 
+**13)** Scene flow handling in multiplayer projects: NetworkManager.SceneManager.LoadScene(), SceneManager.OnLoadEventCompleted, NetworkObject.SpawnPlayerObject()
 
--Scene flow handling in multiplayer projects: NetworkManager.SceneManager.LoadScene(), SceneManager.OnLoadEventCompleted, NetworkObject.SpawnPlayerObject()
+When adding scene flow, lifetimes should be taken into account. For necessary elements, 'DontDestroyOnLoad' may be used, or for things that follow events but remain in a single scene, unsubscribing from events should be done in OnDestroy (to prevent unexpected behaviors and avoid memory leaks).
 
-Translate:
-exp: NetworkObject'lerin daha detaylı kullanılması, NetworkObject class'ı detaylı incelenebilir. Scene flow eklemesi yapınca lifetimelar dikkate alınmalı. 
-Gerekli şeyler için dontdestroy on load veya event takip eden ama tek scenede kalan şeyler için OnDestroy'da eventten unsub olmalı. (beklenmedik davranışlar olmasın diye ve memory leake engel olmak için)
-Benzer sebeplerle oyundan ana menüye dönünce instance'lar, singletonlar silinlemi, static eventler resetlenmeli, networkManager shutdown edilmeli.
-Ayrıca bağlantı birkaç saniye sürebildiği için join tuşuna bastığınızda kullanıcıyı uyarıcak UI elemanları göstermek önemli, bağlantı hatası gibi durumlar da bildirilmeli. bu yüzden event sistemleriyle UI emareleri kullanılmalı. 
+For similar reasons, when transitioning from the game to the main menu, instances and singletons should be cleared, static events reset, and the NetworkManager should be shut down. Additionally, since the connection can take a few seconds, it's important to display UI elements that alert the user when pressing the join button and provide notifications for connection errors. Therefore, UI indicators should be implemented using event systems.
 
+**14)** Using Struct's to share data in multiplayer game logic. 
 
--Using Struct's to share data in multiplayer game logic. 
-Translate: 
-exp: Singleplayerdakinin aksine verilen oyuncular arasında paylaşımının kolay olmaması yüzünden Struct'larda tutulması ve Network Listesinde yer alması son derece kolaylık sunuyor. 
-Ayrıca bu listedeki değişimleri takip etmek için  NetworkList<T>.OnListChanged eventi oldukça kullanım kolaylığı sağlıyor. Herhangi bir veri değişiminden listeyi takipte olan bütün elemanlar kolayca haberdar oluyor. 
-Ekrandaki dummylerin gösterilmesi, isimlerinin anı anına yazdırılması, sonraki güncellemelerde eklenecek renk değişimi gibi her şey bu sayede kolayca uygulanıyor.
--Structs can only hold value types, you need auxiliary functions to help them reach their full potential: 
-
+**Code Snippet 4:** Usage of struct for storing player data from Assets/Scripts/PlayerData.cs
 
 ```csharp
 public struct PlayerData : INetworkSerializable, IEquatable<PlayerData> 
@@ -200,51 +230,107 @@ public struct PlayerData : INetworkSerializable, IEquatable<PlayerData>
             playerId == other.playerId;
     }
 }
-//...
- private NetworkList<PlayerData> playerDataNetworkList;
-//...
-
-
 ```
 
-*** REWRIITING STRUCTLIST SNIPPET (for color ID)
+Unlike in singleplayer where sharing between players is not straightforward, storing and including data in Structs and Network Lists provide great convenience. Structs can only hold value types, you need auxiliary functions to help them reach their full potential.
 
-Translate:
-exp: Struct veri tutmak için iyi olsa da gene serialization gerekliliği ile geldiği için kafamıza göre her veriyi tutamıyor. Bu yüzden gerekli olan dataya erişmek için yan fonksiyonlar üretiyoruz.
-Örneğin düz color verisi tutamadığı için renkleri bi listede tutup bu listede refere edilen renklerin indexlerinden erişiyoruz. Commit'in çok büyük bir kısmı bu erişim sorunlarını halletmek için başka bir veri tipi döndüren fonksiyonlara atanmış.
+For instance, since it cannot directly store flat color data, we maintain colors in a list and access them through the indices referenced in this list. A significant portion of the codebase is dedicated to functions that return another data type to address these access issues in order to overcome serialization limitations.
 
-***Example of aux funcions snippet
+Additionally, the NetworkList<T>.OnListChanged event makes it easy to track changes in this list. All elements subscribing to list changes are instantly notified of any data modifications.
+
+This simplifies the implementation of various features such as displaying dummies on the screen, real-time printing of their names, and future updates like color changes. It greatly facilitates the dynamic management of elements on the screen.
+
+**Code Snippet 5:** Sturct data rewriting procedure to trigger onListChanged event, From Assets/Scripts/KitchenGameMultiplayer.cs
+
+```csharp
+public event EventHandler OnPlayerDataNetworkListChanged;
+//...
+ private NetworkList<PlayerData> playerDataNetworkList;
+//...Changing colorId of the struct with the help of some local auxiliary functions
+ [ServerRpc(RequireOwnership = false)]
+    private void ChangePlayerColorServerRpc(int colorId, ServerRpcParams serverRpcParams = default)
+    {
+        if (!IsColorAvailable(colorId))
+        {
+            //color not available
+            return;
+        }
+        int playerDataIndex = GetPlayerDataIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+
+        playerData.colorId = colorId;
+
+        playerDataNetworkList[playerDataIndex] = playerData;
+    }
+//...Various auxiliary functions
+ private bool IsColorAvailable(int colorId)
+    {
+        foreach (PlayerData playerData in playerDataNetworkList)
+        {
+            if (playerData.colorId == colorId)
+            {
+                //color already in use
+                return false;
+
+            }
+        }
+        return true;
+    }	
+public int GetPlayerDataIndexFromClientId(ulong clientId)
+    {
+        for(int i=0; i<playerDataNetworkList.Count; i++)
+        { if (playerDataNetworkList[i].clientId == clientId)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+```
+**15)** Can custumize StartHost() and StartClient() so that host and client can respond differently to a callback or event. 
+
+In adition, the idea of introducing a 'kickPlayer' feature in the 'IsServer' state, where custom UI boxes can be displayed for both hosts and clients, has the potential to enrich the game. Having the same event yield different results on the server and client sides is also a promising use case. 
+
+**16)** Extra validations, null checks or double checks needed to prevent bugs in multiplayer where connection isn't always perfect.
 
 
--Can custumize StartHost() and StartClient() so that host and client can respond differently to a callback or event. 
+# UNITY LOBBY PACKAGE
 
-Translate: 
-Commitle ilgili yorumum: IsServer durumunda bir kickPlayer özelliğinin gelmesi host ve clientlar için custom UI boxlarının gösterilebileceği fikri oyunu zenginleştirmek için kullanılabilir. 
-aynı eventin server ve clientta farklı sonuçları olması da iyi bir kullanım. 
+**1)** Using Unity's official Lobby package, understanding basic concepts about lobby
 
-UNITY LOBBY ADDED
--Using Unity's official Lobby package, understanding basic concepts about lobby
--LobbyService class methods and properties: SendHeartbeatPingAsync(), CreateLobbyAsync(), UpdateLobbyAsync(lobby.id, updateLobbyOptions), QuickJoinLobbyAsync(), DeleteLobbyAsync() etc.  
--Lobby class and its properties: .HostId, .Id, .Data[TKey].Value, 
--AuthenticationService class methods and properties: SignInAnonymouslyAsync(), IsSignedIn, PlayerId 
--Searching Lobbies: LobbyService.QueryLobbiesAsync(), QueryFilter class, queryResponse class
--Async methods with await
+**2)** LobbyService class methods and properties: SendHeartbeatPingAsync(), CreateLobbyAsync(), UpdateLobbyAsync(lobby.id, updateLobbyOptions), QuickJoinLobbyAsync(), DeleteLobbyAsync() etc.  
 
-***LOBİLER İÇİN ÖRNEK KOD SNIPPET KONABİLİR
+**3)** Lobby class and its properties: .HostId, .Id, .Data[TKey].Value, 
 
-exp: Lobi kullanımı için gereken prosedürlerin uygulandığı temiz bir örnek olmuş. Lobilerin neyden sorumlu olduğu, ne gibi özelliklerinin olduğu ve ne gibi etmenlerden etkilenebileceğinin üstünkörü uygulaması oldu.
-Başta çok karışık ve meşakatli gelmişti. Adım adım kodun üstünden geçince anlaşılmıcak bir kısmının olmadığını ama prosedürlerin gerekliliği ve Lobby kütüphanesinden gelen çok fazla fonksiyonu direkt kullandığımız için hakimiyet kazanmadığımı anladım.
-Bence son derece kolay bir şekilde kullanılabiliyor. Ezberlemek veya daha derin kullanımlara şimdilik uğraşmamın anlamı yok. 
-Normal oyun kodlarkenki karşılaşılanın aksine çok fazla abstractlaştırılmış fonksiyonların olması bir oyun geliştirici olarak değil belki ama yazılımcı olarak OOP'yi daha iyi anlamamı sağlıyor. 
+**4)** AuthenticationService class methods and properties: SignInAnonymouslyAsync(), IsSignedIn, PlayerId 
 
- 
-UNITY RELAY ADDED
--Using Unity's official Relay package, understanding basic concepts about relay\
--RelayService class methods and properties: CreateAllocationAsync(), GetJoinCodeAsync(), JoinAllocationAsync()\
--Using Allocation for setting server data of the UnityTransport \
--Task<T> return type for async funcions \
+**5)** Searching Lobbies: LobbyService.QueryLobbiesAsync(), QueryFilter class, queryResponse class
+
+**6)** Async methods with await
+
+
+**Note:** Implementation of procedures for lobby usage that serves as a clear example. It provides a superficial application of what lobbies are responsible for, what features they have, and what factors can affect them.
+
+Initially, it seemed complex and intricate. However, going through the code step by step, I realized that there is no obscure part that cannot be understood, but rather, the necessity of procedures and the use of numerous functions directly from the Lobby library indicated that I had not gained mastery over them.
+
+In my opinion, it is remarkably easy to use. For now, there is no need to memorize or delve into more complex use cases. Unlike what is encountered in normal game coding, the presence of many abstracted functions may not be intuitive for a game developer, but as a programmer, it contributes to a better understanding of OOP.
+
+# UNITY RELAY PACKAGE
+
+**1)** Using Unity's official Relay package, understanding basic concepts about relay
+
+**2)** RelayService class methods and properties: CreateAllocationAsync(), GetJoinCodeAsync(), JoinAllocationAsync()
+
+**3)** Using Allocation for setting server data of the UnityTransport.
+
+**4)** Task<T> return type for async funcions.
 
 Example code that uses lobby and relay services together.
+
+**Code Snippet 6:** Example code that uses lobby and relay services together from Assets/Scripts/KitchenGameLobby.cs
+
 ```csharp
      public async void CreateLobby(string lobbyName, bool isPrivate)
     {
@@ -276,9 +362,3 @@ Example code that uses lobby and relay services together.
         }
     }
 ```
-exp:Özellikle Task<T> döndüren async fonksiyonlar bence programlamamı bir adım öteye taşıyabilecek yapılar. OOP ve yeni kütüphanelerde çalışmanın başka bir örneği daha. 
-Bütün bu dersle beraber online oyunların yapısıyla alakalı daha çok şey öğrenmiş oldum. 
-
--Extra validations, null checks or double checks needed to prevent bugs in multiplayer where connection isnt always perfect
-
-/WORK IN PROGRESS/
