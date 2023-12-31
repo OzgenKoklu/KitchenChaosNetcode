@@ -1,6 +1,6 @@
 # Kitchen Chaos Online with netcode for gameObjects, Lobby & relay
 
-<img src="Assets/_Assets/Textures/KitchenChaosLogo.png" width="550">
+<img src="Assets/_Assets/Textures/KitchenChaosLogo.png" alt="Kitchen Chaos Logo" width="550" class="center" >
 
 **ABOUT THE PROJECT:** This project is based on Code Monkey's step-by-step tutorial on how to use Unity's netcode for game objects, lobby, and relay packages. You can find it [here.](https://www.youtube.com/watch?v=7glCsF9fv3s) This game project started as a single-player-only game; later on, netcode support was added. I've also uploaded the complete single-player repository on GitHub, [here.](https://github.com/OzgenKoklu/KitchenChaosSingleplayer) In this readme, I only mention the Netcode/Lobby/Relay-related features and coding. The repository for the single-player project includes details on the main game mechanics.
 
@@ -11,7 +11,7 @@ This build won't run on your computer as is unless linked to Unity Services. To 
 It is a complete package with scene cycles, sound and animation, an options menu, savable settings, and key bindings, with added multiplayer!"
 
 ---
-**TLDR:**  In Short, what I've learned from this project:
+**TL;DR:**  In Short, what I've learned from this project:
 
 **1.** Implementing Netcode for GameObject, Lobby & Relay by Unity into an already existing single-player game.
 
@@ -43,7 +43,7 @@ Settings UI
 
 Gameplay 
 
-<img src="ReadmeMedia/gif/2.Gameplay.gif" width="450"> \
+<img src="ReadmeMedia/gif/2.Gameplay.gif" width="450"> 
 
 Character Select Screen 
 
@@ -61,12 +61,15 @@ Entire game loop can be viewed in this youtube video:
 
 **Short answer:** *The source code changed too much.* 
 
-Since I'm relatively new to multiplayer development, I'm not familiar with the structures and design choices implemented in its current state. Before this project, I hadn't worked on any multiplayer game projects. I had heard of Photon Network, which I believe is still a popular option for creating multiplayer games. The architectural requirements for a multiplayer game are entirely different, and the programmer must decide whether the game will be server authoritative or client authoritative, a decision that significantly impacts the project's structure. In single-player games, especially when you are at the very beginning of your developer journey, you mainly deal with what's on the screen, adjusting behaviors to make the gameplay. However, for multiplayer development, the entire communication process must be carefully thought out. There's an essence of backend development in this sense, where requests should be handled in particular ways. This project helped me further understand C# and OOP concepts. I grasped them while building it, but I still feel somewhat unfamiliar.
+Since I'm relatively new to multiplayer development, I'm not familiar with the structures and design choices implemented in its current state. Before this project, I hadn't worked on any multiplayer game projects. I had heard of Photon Network, which I believe is still a popular option for creating multiplayer games. The architectural requirements for a multiplayer game are entirely different, and the programmer must decide whether the game will be server authoritative or client authoritative, a decision that significantly impacts the project's structure.
+
+In single-player games, especially when you are at the very beginning of your developer journey, you mainly deal with what's on the screen, adjusting behaviors to make the gameplay. However, for multiplayer development, the entire communication process must be carefully thought out. There's an essence of backend development in this sense, where requests should be handled in particular ways. This project helped me further understand C# and OOP concepts. I grasped them while building it, but I still feel somewhat unfamiliar.
 
 ---
+
 # More about what's covered in this project for those with more time:
 
-The project is a course project by Code Monkey, and its curriculum can be found [here.](https://unitycodemonkey.com/kitchenchaosmultiplayercourse.php) However, I want to revisit my own commits and create my own list of what I've learned:
+The project is a course project by Code Monkey, and it's curriculum can be found [here.](https://unitycodemonkey.com/kitchenchaosmultiplayercourse.php) However, I want to revisit my own commits and create my own list of what I've learned:
 
 # **What I've learned:** 
 
@@ -89,11 +92,11 @@ Fundamentally, every validation that affects gameplay should go through the serv
 **6.** Network Friendly data sharing: NetworkObjectReference, basic value types, local functions that aid this process. (index > scriptableObject, scriptableObject > index etc)
 
 
-**Note:** Operations on objects with NetworkBehavior, such as destruction, instantiation, parent assignment, and changes in hierarchy, need to be communicated to other clients by the server. Therefore, a design has been implemented to gradually shift all logics involving these operations towards validation and/or notification through ServerRPCs.\
+**Note:** Operations on objects with NetworkBehavior, such as destruction, instantiation, parent assignment, and changes in hierarchy, need to be communicated to other clients by the server. Therefore, a design has been implemented to gradually shift all logics involving these operations towards validation and/or notification through ServerRPCs.
 
-There are some limitations to sending arguments to ServerRPC; it's not as straightforward as accessing any data type and any script. Hence, it should work with simple data types like int and float, and access other classes through NetworkObjectReference.\
+There are some limitations to sending arguments to ServerRPC; it's not as straightforward as accessing any data type and any script. Hence, it should work with simple data types like int and float, and access other classes through NetworkObjectReference.
 
-This, however, results in solving problems that could be handled with concise code into longer lines and passing through 2-3 different methods (like shown in Code Snippet 1), even though they are seemingly simple issues. While it may be straightforward, keeping the necessary data locally in a list and accessing it through an index can be a reasonable solution.\
+This, however, results in solving problems that could be handled with concise code into longer lines and passing through 2-3 different methods (like shown in Code Snippet 1), even though they are seemingly simple issues. While it may be straightforward, keeping the necessary data locally in a list and accessing it through an index can be a reasonable solution.
 
 Another example is, when kitchenObject sets its parent, it selected its transform directly, for online the reason FollowTransform.cs is necessary is that even if we have access to the class of the Parent Object passed through ServerRPC as a reference, 
 the Transform information is incomplete. Therefore, rethinking such logics may be necessary from the beginning.
@@ -118,12 +121,14 @@ the Transform information is incomplete. Therefore, rethinking such logics may b
     }
 ```
 
-**7.** Multiplayer Game Logic flow, How to use timers in online and when to trigger serverRPC/ClientRPC.\
+**7.** Multiplayer Game Logic flow, How to use timers in online and when to trigger serverRPC/ClientRPC.
 
 **Note:** In essence, the organization of events triggered by the client that we want other players to see, and the code structure of these events:
 
-**Step 1)** The local player/client/server triggers a logic and directs it to ServerRPC.\
-**Step 2)** ServerRPC validates and/or intervenes in a situation related to NetworkObject behaviors, and/or directs it to clientRPC.\
+**Step 1)** The local player/client/server triggers a logic and directs it to ServerRPC.
+
+**Step 2)** ServerRPC validates and/or intervenes in a situation related to NetworkObject behaviors, and/or directs it to clientRPC.
+
 **Step 3)** ClientRPC provides a visual response, such as triggering an event in local code and/or playing an animation, opening UI.
 
 In addition to the execution order in MonoBehaviour, special Netcode-specific execution functions such as OnNetworkSpawned should also be taken into account. Attention should be paid to where tasks such as event tracking should be performed.
@@ -302,7 +307,7 @@ In adition, the idea of introducing a 'kickPlayer' feature in the 'IsServer' sta
 
 **2.** LobbyService class methods and properties: SendHeartbeatPingAsync(), CreateLobbyAsync(), UpdateLobbyAsync(lobby.id, updateLobbyOptions), QuickJoinLobbyAsync(), DeleteLobbyAsync() etc.  
 
-**3.** Lobby class and its properties: .HostId, .Id, .Data[TKey].Value, 
+**3.** Lobby class and its properties: .HostId, .Id, .Data[TKey].Value
 
 **4.** AuthenticationService class methods and properties: SignInAnonymouslyAsync(), IsSignedIn, PlayerId 
 
@@ -327,9 +332,8 @@ In my opinion, it is remarkably easy to use. For now, there is no need to memori
 
 **4.** Task<T> return type for async funcions.
 
-Example code that uses lobby and relay services together.
 
-**Code Snippet 6:** Example code that uses lobby and relay services together from Assets/Scripts/KitchenGameLobby.cs
+**Code Snippet 6:** Example code that uses lobby and relay services together, from Assets/Scripts/KitchenGameLobby.cs
 
 ```csharp
      public async void CreateLobby(string lobbyName, bool isPrivate)
