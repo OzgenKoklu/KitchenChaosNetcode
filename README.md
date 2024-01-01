@@ -49,11 +49,15 @@ Character Select Screen
 
 <img src="ReadmeMedia/gif/1.CharacterSelect.gif" width="450"> 
 
-# Youtube Video
+# Video
 
-Entire game loop can be viewed in this youtube video:
+The entire game loop can be viewed in this video:
 
-[![Youtube Link](https://img.youtube.com/vi/lrHCDELBiAE/0.jpg)](https://youtu.be/lrHCDELBiAE)
+
+https://github.com/OzgenKoklu/KitchenChaosNetcode/assets/29312226/a0bfa56f-9b40-4c71-b1d8-88c1cce20009
+
+
+There's also a YouTube [link.](https://youtu.be/lrHCDELBiAE)
 
 ---
 
